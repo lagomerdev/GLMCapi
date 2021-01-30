@@ -40,6 +40,19 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>3.4.1</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>3.4.5</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>pl.glmc</groupId>
             <artifactId>glmc-api-bungee</artifactId>
             <version>0.1.2</version>
