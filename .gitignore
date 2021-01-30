@@ -1,0 +1,9 @@
+*.iml
+.idea
+dependency-reduced-pom.xml
+# Project exclude paths
+/api-bukkit/target/
+/api-bungee/target/
+/api-common/target/
+/core-bukkit/target/
+/core-bungee/target/
