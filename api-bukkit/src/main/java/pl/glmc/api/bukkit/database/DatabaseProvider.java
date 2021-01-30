@@ -5,6 +5,9 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.plugin.Plugin;
 import pl.glmc.api.common.config.DatabaseConfig;
 
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.RowSetFactory;
+import javax.sql.rowset.RowSetProvider;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +21,7 @@ public class DatabaseProvider {
 
     private DatabaseConfig databaseConfig;
 
+    private RowSetFactory rowSetFactory;
     private HikariDataSource dataSource;
 
     /**
@@ -48,6 +52,12 @@ public class DatabaseProvider {
         this.dataSource.addDataSourceProperty("dataSource.cachePrepStmts", "true");
         this.dataSource.addDataSourceProperty("dataSource.prepStmtCacheSize", 250);
         this.dataSource.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+
+        try {
+            this.rowSetFactory = RowSetProvider.newFactory();
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
 
         try (final Connection testConnection = this.dataSource.getConnection()) {
             this.plugin.getLogger().info(ChatColor.GREEN + "Successfully connected to MYSQL!");
@@ -111,12 +121,13 @@ public class DatabaseProvider {
      * @param params parameters to apply
      * @return query response
      */
-    public ResultSet getSync(final String statement, final Object... params) {
-        try (final Connection connection = this.dataSource.getConnection()) {
-            final PreparedStatement query = connection.prepareStatement(statement);
+    public CachedRowSet getSync(final String statement, final Object... params) {
+        try (final Connection connection = this.dataSource.getConnection(); final PreparedStatement query = connection.prepareStatement(statement)) {
             this.applyParams(query, params);
 
-            return query.executeQuery();
+            CachedRowSet crs = rowSetFactory.createCachedRowSet();
+            crs.populate(query.executeQuery());
+            return crs;
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
