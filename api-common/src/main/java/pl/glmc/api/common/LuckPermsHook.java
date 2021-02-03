@@ -49,6 +49,16 @@ public interface LuckPermsHook {
     String getPrimaryGroup(UUID playerUUID, boolean refresh);
 
     /**
+     * Gets value of given metadata key
+     *
+     * @param playerUUID player's unique identifier
+     * @param metaKey key to get
+     * @param refresh specifies if cached data should be updated
+     * @return meta value of given key
+     */
+    String getMetaValue(UUID playerUUID, String metaKey, boolean refresh);
+
+    /**
      * Checks if user has given permission using LuckPerms API.
      *
      * With refresh set to true, it MUST be called asynchronously
@@ -56,11 +66,11 @@ public interface LuckPermsHook {
      * because it's blocking operation.
      *
      * @param playerUUID player's unique identifier
-     * @param refresh specifies if cached data should be updated
      * @param permission permission
+     * @param refresh specifies if cached data should be updated
      * @return boolean which specifies if given player has given permission
      */
-    boolean hasPermission(UUID playerUUID, boolean refresh, String permission);
+    boolean hasPermission(UUID playerUUID, String permission, boolean refresh);
 
     /**
      * Gets LuckPerms API instance

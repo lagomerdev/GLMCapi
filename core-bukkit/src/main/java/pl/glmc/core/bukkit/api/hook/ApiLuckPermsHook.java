@@ -85,7 +85,18 @@ public class ApiLuckPermsHook implements LuckPermsHook {
     }
 
     @Override
-    public boolean hasPermission(UUID playerUUID, boolean refresh, String permission) {
+    public String getMetaValue(UUID playerUUID, String metaKey, boolean refresh) {
+        User user = this.getUser(playerUUID, refresh);
+
+        if (user == null) {
+            throw new NullPointerException("Failed getting user from LuckPerms!");
+        }
+
+        return user.getCachedData().getMetaData().getMetaValue(metaKey);
+    }
+
+    @Override
+    public boolean hasPermission(UUID playerUUID, String permission, boolean refresh) {
         User user = this.getUser(playerUUID, refresh);
 
         if (user == null) {
