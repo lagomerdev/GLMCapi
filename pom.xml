@@ -7,7 +7,7 @@
     <groupId>pl.glmc</groupId>
     <artifactId>glmc</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.2</version>
+    <version>0.2.0-alpha</version>
     <modules>
         <module>core-bukkit</module>
         <module>core-bungee</module>

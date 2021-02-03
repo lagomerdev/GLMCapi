@@ -3,6 +3,7 @@ package pl.glmc.api.bukkit.database;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.plugin.Plugin;
+import pl.glmc.api.common.Callback;
 import pl.glmc.api.common.config.RedisConfig;
 import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisConnectionException;
@@ -172,6 +173,49 @@ public class RedisProvider {
     }
 
     /**
+     * Sets key to given value
+     *
+     * @param key redis key
+     * @param value set value
+     */
+    public void set(final String key, final String value) {
+        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            try (Jedis jedis = this.jedisPool.getResource()) {
+                jedis.set(key, value);
+            }
+        });
+    }
+
+    /**
+     * Gets value of given key synchronously
+     *
+     * @param key redis key
+     * @return string value
+     */
+    public String getSync(final String key) {
+        try (Jedis jedis = this.jedisPool.getResource()) {
+            return jedis.get(key);
+        }
+    }
+
+    /**
+     * Gets value of given key asynchronously
+     *
+     * @param callback callback called when getting value is completed
+     * @param key redis key
+     */
+    public void getAsync(final Callback<String, Throwable> callback, final String key) {
+        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            try (Jedis jedis = this.jedisPool.getResource()) {
+                String result = jedis.get(key);
+
+                callback.done(result, null);
+            }
+        });
+    }
+
+    /**
+     * Gets Jedis Pool
      *
      * @return redis connection pool
      */

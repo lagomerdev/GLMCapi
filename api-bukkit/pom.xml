@@ -7,7 +7,7 @@
     <parent>
         <artifactId>glmc</artifactId>
         <groupId>pl.glmc</groupId>
-        <version>0.1.2</version>
+        <version>0.2.0-alpha</version>
     </parent>
 
     <name>GlmcAPIBukkit</name>
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>pl.glmc</groupId>
             <artifactId>glmc-api-common</artifactId>
-            <version>0.1.2</version>
+            <version>0.2.0-alpha</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

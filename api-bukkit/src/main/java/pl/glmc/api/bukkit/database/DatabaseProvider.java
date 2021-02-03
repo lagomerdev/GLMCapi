@@ -3,6 +3,7 @@ package pl.glmc.api.bukkit.database;
 import com.zaxxer.hikari.HikariDataSource;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.plugin.Plugin;
+import pl.glmc.api.common.Callback;
 import pl.glmc.api.common.config.DatabaseConfig;
 
 import javax.sql.rowset.CachedRowSet;
@@ -81,16 +82,21 @@ public class DatabaseProvider {
      *
      * @param statement sql statement to execute
      * @param params parameters to apply
+     * @return true if success false if failed
      */
-    public void updateSync(final String statement, final Object... params) {
+    public boolean updateSync(final String statement, final Object... params) {
         try (final Connection connection = this.dataSource.getConnection()) {
             final PreparedStatement update = connection.prepareStatement(statement);
             this.applyParams(update, params);
 
             update.executeUpdate();
             update.close();
+
+            return true;
         } catch (SQLException exception) {
             exception.printStackTrace();
+
+            return false;
         }
     }
 
@@ -178,9 +184,5 @@ public class DatabaseProvider {
      */
     public HikariDataSource getDataSource() {
         return this.dataSource;
-    }
-
-    public interface Callback<ResultSet, Throwable> {
-        void done(ResultSet resultSet, Throwable throwable);
     }
 }
