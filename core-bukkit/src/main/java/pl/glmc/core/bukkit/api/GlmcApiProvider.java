@@ -2,6 +2,7 @@ package pl.glmc.core.bukkit.api;
 
 import org.bukkit.ChatColor;
 import pl.glmc.api.bukkit.GlmcApiBukkit;
+import pl.glmc.api.bukkit.GlmcApiBukkitProvider;
 import pl.glmc.api.common.LuckPermsHook;
 import pl.glmc.api.common.economy.Economy;
 import pl.glmc.api.common.economy.EconomyFactory;
@@ -23,6 +24,8 @@ public class GlmcApiProvider implements GlmcApiBukkit {
         this.luckPermsHook = new ApiLuckPermsHook(this.plugin);
         this.economyFactory = new ApiEconomyFactory(this.plugin);
         this.localEconomy = new LocalEconomy(this.plugin, this);
+
+        GlmcApiBukkitProvider.register(this);
 
         this.plugin.getLogger().info(ChatColor.DARK_GREEN + "Loaded API Provider");
     }
