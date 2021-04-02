@@ -1,4 +1,4 @@
-package pl.glmc.core.bukkit.api.economy;
+/*package pl.glmc.core.bungee.api.economy;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,4 +32,4 @@ public class LocalCacheListener implements Listener {
             this.apiEconomyProvider.removeFromCache(playerUUID);
         }
     }
-}
+}*/

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>glmc</artifactId>
+        <artifactId>glmc-api</artifactId>
         <groupId>pl.glmc</groupId>
         <version>0.2.0-alpha</version>
     </parent>

@@ -1,5 +1,6 @@
 package pl.glmc.core.bukkit;
 
+import com.google.gson.Gson;
 import org.bukkit.plugin.java.JavaPlugin;
 import pl.glmc.api.bukkit.database.DatabaseProvider;
 import pl.glmc.api.bukkit.database.RedisProvider;
@@ -13,10 +14,14 @@ public class GlmcCoreBukkit extends JavaPlugin {
     private DatabaseProvider databaseProvider;
     private RedisProvider redisProvider;
 
+    private Gson gson;
+
     private GlmcApiProvider glmcApiProvider;
 
     @Override
     public void onLoad() {
+        this.gson = new Gson();
+
         this.loadFiles();
 
         this.configProvider = new ConfigProvider(this);
@@ -56,5 +61,9 @@ public class GlmcCoreBukkit extends JavaPlugin {
 
     public GlmcApiProvider getGlmcApiProvider() {
         return glmcApiProvider;
+    }
+
+    public Gson getGson() {
+        return gson;
     }
 }

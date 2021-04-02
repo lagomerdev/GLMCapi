@@ -1,6 +1,6 @@
-package pl.glmc.core.bukkit.api.economy.tasks;
+package pl.glmc.core.bungee.api.economy.tasks;
 
-import pl.glmc.core.bukkit.api.economy.ApiEconomyProvider;
+import pl.glmc.core.bungee.api.economy.ApiEconomyProvider;
 
 import java.math.BigDecimal;
 import java.util.UUID;

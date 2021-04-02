@@ -11,3 +11,5 @@ connections:
     port: 6379
     timeout: 500
     password: ''
+server:
+  id: 'proxy'

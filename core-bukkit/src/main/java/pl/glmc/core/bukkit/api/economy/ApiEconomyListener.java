@@ -1,4 +1,4 @@
-package pl.glmc.core.bukkit.api.economy;
+/*package pl.glmc.core.bukkit.api;
 
 import redis.clients.jedis.JedisPubSub;
 
@@ -21,3 +21,4 @@ public class ApiEconomyListener extends JedisPubSub {
         }
     }
 }
+*/

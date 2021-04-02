@@ -91,7 +91,16 @@ public class RedisProvider {
             try (Jedis jedis = this.jedisPool.getResource()) {
                 this.jedisPubSubList.add(jedisPubSub);
 
-                jedis.subscribe(jedisPubSub, channels);
+                jedis.psubscribe(jedisPubSub, channels);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println(ChatColor.RED + "Uncatched exception occureed in " + jedisPubSub.getClass().getName() + "! Re-subscribing JedisPubSub...");
+
+                jedisPubSub.unsubscribe();
+
+                this.jedisPubSubList.remove(jedisPubSub);
+
+                this.psubscribe(jedisPubSub, channels);
             }
         });
     }
@@ -107,7 +116,16 @@ public class RedisProvider {
             try (Jedis jedis = this.jedisPool.getResource()) {
                 this.binaryJedisPubSubList.add(binaryJedisPubSub);
 
-                jedis.psubscribe(binaryJedisPubSub, channels);
+                jedis.subscribe(binaryJedisPubSub, channels);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println(ChatColor.RED + "Uncatched exception occureed in " + binaryJedisPubSub.getClass().getName() + "! Re-subscribing BinaryJedisPubSub...");
+
+                binaryJedisPubSub.unsubscribe();
+
+                this.binaryJedisPubSubList.remove(binaryJedisPubSub);
+
+                this.psubscribe(binaryJedisPubSub, channels);
             }
         });
     }
@@ -124,6 +142,15 @@ public class RedisProvider {
                 this.jedisPubSubList.add(jedisPubSub);
 
                 jedis.psubscribe(jedisPubSub, patterns);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println(ChatColor.RED + "Uncatched exception occureed in " + jedisPubSub.getClass().getName() + "! Re-subscribing JedisPubSub...");
+
+                jedisPubSub.unsubscribe();
+
+                this.jedisPubSubList.remove(jedisPubSub);
+
+                this.psubscribe(jedisPubSub, patterns);
             }
         });
     }
@@ -140,6 +167,15 @@ public class RedisProvider {
                 this.binaryJedisPubSubList.add(binaryJedisPubSub);
 
                 jedis.psubscribe(binaryJedisPubSub, patterns);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println(ChatColor.RED + "Uncatched exception occureed in " + binaryJedisPubSub.getClass().getName() + "! Re-subscribing BinaryJedisPubSub...");
+
+                binaryJedisPubSub.unsubscribe();
+
+                this.binaryJedisPubSubList.remove(binaryJedisPubSub);
+
+                this.psubscribe(binaryJedisPubSub, patterns);
             }
         });
     }

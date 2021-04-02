@@ -6,25 +6,26 @@ import pl.glmc.api.bukkit.GlmcApiBukkitProvider;
 import pl.glmc.api.common.LuckPermsHook;
 import pl.glmc.api.common.economy.Economy;
 import pl.glmc.api.common.economy.EconomyFactory;
+import pl.glmc.api.common.packet.PacketService;
 import pl.glmc.core.bukkit.GlmcCoreBukkit;
-import pl.glmc.core.bukkit.api.economy.LocalEconomy;
-import pl.glmc.core.bukkit.api.economy.ApiEconomyFactory;
 import pl.glmc.core.bukkit.api.hook.ApiLuckPermsHook;
+import pl.glmc.core.bukkit.api.packet.ApiNetworkService;
+import pl.glmc.core.bukkit.api.packet.ApiPacketService;
 
 public class GlmcApiProvider implements GlmcApiBukkit {
     private final GlmcCoreBukkit plugin;
 
     private final LuckPermsHook luckPermsHook;
-    private final EconomyFactory economyFactory;
-    private final LocalEconomy localEconomy;
+    private final ApiPacketService packetService;
+    private final ApiNetworkService networkService;
 
     public GlmcApiProvider(GlmcCoreBukkit plugin) {
         this.plugin = plugin;
 
         this.luckPermsHook = new ApiLuckPermsHook(this.plugin);
-        this.economyFactory = new ApiEconomyFactory(this.plugin);
-        this.localEconomy = new LocalEconomy(this.plugin, this);
 
+        this.packetService = new ApiPacketService(this.plugin);
+        this.networkService = new ApiNetworkService(this.plugin, this.packetService);
         GlmcApiBukkitProvider.register(this);
 
         this.plugin.getLogger().info(ChatColor.DARK_GREEN + "Loaded API Provider");
@@ -37,16 +38,21 @@ public class GlmcApiProvider implements GlmcApiBukkit {
 
     @Override
     public EconomyFactory getEconomyFactory() {
-        return this.economyFactory;
+        return null;
     }
 
     @Override
     public Economy getPlayerBankEconomy() {
-        return this.localEconomy.getPlayerBankEconomy();
+        return null;
     }
 
     @Override
     public Economy getPlayerCashEconomy() {
-        return this.localEconomy.getPlayerBankEconomy();
+        return null;
+    }
+
+    @Override
+    public PacketService getPacketService() {
+        return this.packetService;
     }
 }

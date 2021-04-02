@@ -1,6 +1,6 @@
-package pl.glmc.core.bukkit.api.economy.tasks;
+/*package pl.glmc.core.bukkit.api;
 
-import pl.glmc.core.bukkit.api.economy.ApiEconomyProvider;
+import pl.glmc.core.bungee.api.economy.ApiEconomyProvider;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -28,4 +28,4 @@ public class RefreshBalanceTask implements Runnable {
             e.printStackTrace();
         }
     }
-}
+}*/

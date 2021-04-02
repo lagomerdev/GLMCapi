@@ -1,51 +1,45 @@
-package pl.glmc.core.bukkit.api.economy;
+package pl.glmc.core.bungee.api.economy;
 
 import net.md_5.bungee.api.ChatColor;
-import org.apache.commons.lang.NotImplementedException;
 import pl.glmc.api.common.EconomyType;
 import pl.glmc.api.common.config.EconomyConfig;
 import pl.glmc.api.common.economy.Economy;
-import pl.glmc.core.bukkit.GlmcCoreBukkit;
-import pl.glmc.core.bukkit.api.economy.tasks.AddBalanceTask;
-import pl.glmc.core.bukkit.api.economy.tasks.RefreshBalanceTask;
-import pl.glmc.core.bukkit.api.economy.tasks.RemoveBalanceTask;
+import pl.glmc.core.bungee.GlmcCoreBungee;
+import pl.glmc.core.bungee.api.economy.tasks.AddBalanceTask;
+import pl.glmc.core.bungee.api.economy.tasks.RemoveBalanceTask;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.*;
 
 public class ApiEconomyProvider implements Economy {
-    private String insertLogStatement, createAccountStatement , getDataStatement, redisNotifyChannel;
+    private String insertLogStatement, createAccountStatement, getDataStatement, redisNotifyChannel;
 
-    private final GlmcCoreBukkit plugin;
+    private final GlmcCoreBungee plugin;
     private final EconomyConfig economyConfig;
     private final ConcurrentHashMap<UUID, BigDecimal> accountsCache;
-    private final List<UUID> ignoreCacheRefresh;
     private final ExecutorService economyTasksExecutor;
 
-    public ApiEconomyProvider(GlmcCoreBukkit plugin, EconomyConfig economyConfig) {
+    public ApiEconomyProvider(GlmcCoreBungee plugin, EconomyConfig economyConfig) {
         this.plugin = plugin;
         this.economyConfig = economyConfig;
 
         this.accountsCache = new ConcurrentHashMap<>();
-        this.ignoreCacheRefresh = new ArrayList<>();
         this.economyTasksExecutor = Executors.newSingleThreadExecutor();
 
         this.plugin.getLogger().info(ChatColor.GREEN + "Created Economy " + economyConfig.getName());
     }
 
     public void register() {
-        final String economyDataTableName = "economy_" + economyConfig.getName() + "_data";
-        final String economyLogsTableName = "economy_" + economyConfig.getName() + "_logs";
+        final String economyDataTableName = "economy_" + this.economyConfig.getName() + "_data";
+        final String economyLogsTableName = "economy_" + this.economyConfig.getName() + "_logs";
 
         this.insertLogStatement =  "INSERT INTO `" + economyLogsTableName  + "` (`account_uuid`, `amount`, `action`) VALUES (?, ?, ?)";
         this.getDataStatement = "SELECT * FROM `" + economyDataTableName + "` WHERE `uuid` = ?";
         this.createAccountStatement = "INSERT INTO `" + economyDataTableName + "` (`uuid`, `balance`, `active`) VALUES (?, ?, ?)";
-        this.redisNotifyChannel = "economy." + economyConfig.getName() + ".notify";
+        this.redisNotifyChannel = "economy." + this.economyConfig.getName() + ".notify";
 
         final String economyDataTable = "CREATE TABLE IF NOT EXISTS `" + economyDataTableName + "` ( " +
                 " `uuid` char(36) NOT NULL, " +
@@ -67,7 +61,7 @@ public class ApiEconomyProvider implements Economy {
         this.plugin.getDatabaseProvider().updateSync(economyLogsTable);
 
         final String economyDataUpdateTrigger = "CREATE DEFINER= " + this.plugin.getConfigProvider().getDatabaseConfig().getUsername() +  "@" + this.plugin.getConfigProvider().getDatabaseConfig().getHost() + " " +
-                "TRIGGER IF NOT EXISTS update_economy_" + economyConfig.getName() + "_data_update " +
+                "TRIGGER IF NOT EXISTS update_economy_" + this.economyConfig.getName() + "_data_update " +
                 "BEFORE INSERT ON " + economyLogsTableName + " " +
                 "FOR EACH ROW " +
                 "BEGIN " +
@@ -80,11 +74,7 @@ public class ApiEconomyProvider implements Economy {
 
         this.plugin.getDatabaseProvider().updateSync(economyDataUpdateTrigger);
 
-        ApiEconomyListener apiEconomyListener = new ApiEconomyListener(this);
-
-        this.plugin.getRedisProvider().subscribe(apiEconomyListener, this.redisNotifyChannel);
-
-        this.plugin.getLogger().info(ChatColor.DARK_GREEN + "Registered economy " + this.economyConfig.getName());
+        this.plugin.getLogger().info(ChatColor.GREEN + "Registered economy " + ChatColor.DARK_GREEN + this.economyConfig.getName());
     }
 
     public boolean insertLog(UUID accountUUID, BigDecimal amount, boolean action) {
@@ -95,7 +85,6 @@ public class ApiEconomyProvider implements Economy {
             final BigDecimal update = action ? current.add(amount) : current.subtract(amount);
 
             this.accountsCache.put(accountUUID, update);
-            this.ignoreCacheRefresh.add(accountUUID);
 
             this.plugin.getRedisProvider().publish(this.redisNotifyChannel, accountUUID.toString());
         }
@@ -122,19 +111,6 @@ public class ApiEconomyProvider implements Economy {
                 exception.printStackTrace();
             }
         }, this.getDataStatement, accountUUID.toString());
-    }
-
-    public void refreshCachedData(UUID accountUUID) {
-        RefreshBalanceTask refreshBalanceTask = new RefreshBalanceTask(this, accountUUID);
-
-        this.economyTasksExecutor.submit(refreshBalanceTask);
-    }
-
-    protected boolean checkRefreshIgnored(UUID accountUUID) {
-        boolean contains = this.ignoreCacheRefresh.contains(accountUUID);
-        if (contains) this.ignoreCacheRefresh.remove(accountUUID);
-
-        return contains;
     }
 
     @Override
@@ -237,7 +213,7 @@ public class ApiEconomyProvider implements Economy {
 
         final CompletableFuture<Boolean> response = new CompletableFuture<>();
 
-        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
+        this.plugin.getProxy().getScheduler().runAsync(this.plugin, () -> {
             final CompletableFuture<Boolean> removed = this.remove(accountUUID, amount);
             if (!removed.join()) {
                 response.complete(false);
@@ -264,7 +240,7 @@ public class ApiEconomyProvider implements Economy {
 
     @Override
     public void reset(UUID accountUUID) {
-        throw new NotImplementedException("This future hasn't been implemented yet!");
+        //todo
     }
 
     @Override

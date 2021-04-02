@@ -1,17 +1,17 @@
-package pl.glmc.core.bukkit.api.economy;
+package pl.glmc.core.bungee.api.economy;
 
 import pl.glmc.api.common.config.EconomyConfig;
 import pl.glmc.api.common.economy.Economy;
 import pl.glmc.api.common.economy.EconomyFactory;
-import pl.glmc.core.bukkit.GlmcCoreBukkit;
+import pl.glmc.core.bungee.GlmcCoreBungee;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ApiEconomyFactory implements EconomyFactory {
-    private final GlmcCoreBukkit plugin;
+    private final GlmcCoreBungee plugin;
     private final ConcurrentHashMap<String, Economy> registeredEconomies;
 
-    public ApiEconomyFactory(GlmcCoreBukkit plugin) {
+    public ApiEconomyFactory(GlmcCoreBungee plugin) {
         this.plugin = plugin;
         this.registeredEconomies = new ConcurrentHashMap<>();
     }

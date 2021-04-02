@@ -3,6 +3,7 @@ package pl.glmc.api.bukkit;
 import pl.glmc.api.common.LuckPermsHook;
 import pl.glmc.api.common.economy.Economy;
 import pl.glmc.api.common.economy.EconomyFactory;
+import pl.glmc.api.common.packet.PacketService;
 
 public interface GlmcApiBukkit {
 
@@ -34,4 +35,10 @@ public interface GlmcApiBukkit {
      * @return player cash economy
      */
     Economy getPlayerCashEconomy();
+
+    /**
+     *
+     * @return
+     */
+    PacketService getPacketService();
 }

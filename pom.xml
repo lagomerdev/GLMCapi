@@ -5,16 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>pl.glmc</groupId>
-    <artifactId>glmc</artifactId>
+    <artifactId>glmc-api</artifactId>
     <packaging>pom</packaging>
     <version>0.2.0-alpha</version>
+    <name>GLMCapi</name>
+
     <modules>
         <module>core-bukkit</module>
         <module>core-bungee</module>
+        <module>core-common</module>
         <module>api-common</module>
         <module>api-bukkit</module>
         <module>api-bungee</module>
     </modules>
-
-
 </project>

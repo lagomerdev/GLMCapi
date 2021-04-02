@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>glmc</artifactId>
+        <artifactId>glmc-api</artifactId>
         <groupId>pl.glmc</groupId>
         <version>0.2.0-alpha</version>
     </parent>
@@ -46,6 +46,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>pl.glmc</groupId>
+            <artifactId>glmc-core-common</artifactId>
+            <version>0.2.0-alpha</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>3.4.1</version>
@@ -81,18 +87,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <relocations>
-                        <relocation>
-                            <pattern>com.zaxxer.hikari</pattern>
-                            <shadedPattern>pl.glmc.glmcapi.lib.hikari</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>redis.clients.jedis</pattern>
-                            <shadedPattern>pl.glmc.glmcapi.lib.jedis</shadedPattern>
-                        </relocation>
-                    </relocations>
-                </configuration>
             </plugin>
         </plugins>
     </build>

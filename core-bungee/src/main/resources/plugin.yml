@@ -1,3 +1,4 @@
 main: ${project.parent.groupId}.core.bungee.${project.name}
 name: ${project.parent.name}
 version: ${project.version}
+depends: [LuckPerms]

@@ -7,3 +7,4 @@ dependency-reduced-pom.xml
 /api-common/target/
 /core-bukkit/target/
 /core-bungee/target/
+/core-common/target/

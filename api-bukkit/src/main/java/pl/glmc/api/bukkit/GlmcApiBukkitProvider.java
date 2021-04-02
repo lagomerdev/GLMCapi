@@ -6,7 +6,9 @@ public final class GlmcApiBukkitProvider {
     public static GlmcApiBukkit get() {
         if (instance == null) {
             throw new NullPointerException("GlmcAPI is not loaded!");
-        }        return instance;
+        }
+
+        return instance;
     }
 
     public static void register(GlmcApiBukkit instance) {

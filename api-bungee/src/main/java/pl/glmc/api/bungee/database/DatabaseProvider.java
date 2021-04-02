@@ -70,7 +70,7 @@ public class DatabaseProvider {
     }
 
     /**
-     * Closes pl.glmc.core.bukkit.pl.glmc.glmc.api.bungee.database connection pool
+     * Closes database connection pool
      */
     public void unload() {
         this.dataSource.close();

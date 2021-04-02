@@ -47,7 +47,9 @@ public class ConfigProvider {
     }
 
     private void loadConfig() {
-        this.configData = new ConfigData();
+        final String serverId = this.plugin.getConfig().getString("server.id");
+
+        this.configData = new ConfigData(serverId);
     }
 
     public ConfigData getConfigData() {
