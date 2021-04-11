@@ -1,13 +1,12 @@
-package pl.glmc.api.common.packet;
+package pl.glmc.api.common.packet.listener;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.MalformedJsonException;
-import net.md_5.bungee.api.ChatColor;
+import pl.glmc.api.common.packet.Packet;
+import pl.glmc.api.common.packet.PacketInfo;
 
 import java.io.NotActiveException;
-import java.lang.reflect.ParameterizedType;
-import java.nio.charset.MalformedInputException;
 
 public abstract class PacketListener<T extends Packet> {
     protected final PacketInfo packetInfo;
@@ -16,10 +15,6 @@ public abstract class PacketListener<T extends Packet> {
     private Gson gson;
     private boolean registered;
 
-    /**
-     *
-     * @param packetInfo
-     */
     public PacketListener(final PacketInfo packetInfo, final Class<T> packetClass) {
         this.packetInfo = packetInfo;
         this.packetClass = packetClass;

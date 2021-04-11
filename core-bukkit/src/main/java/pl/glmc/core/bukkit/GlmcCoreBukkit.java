@@ -16,7 +16,7 @@ public class GlmcCoreBukkit extends JavaPlugin {
 
     private Gson gson;
 
-    private GlmcApiProvider glmcApiProvider;
+    private GlmcApiProvider apiProvider;
 
     @Override
     public void onLoad() {
@@ -31,7 +31,8 @@ public class GlmcCoreBukkit extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        this.glmcApiProvider = new GlmcApiProvider(this);
+        this.apiProvider = new GlmcApiProvider(this);
+        this.apiProvider.load();
     }
 
     @Override
@@ -59,11 +60,15 @@ public class GlmcCoreBukkit extends JavaPlugin {
         return redisProvider;
     }
 
-    public GlmcApiProvider getGlmcApiProvider() {
-        return glmcApiProvider;
+    public GlmcApiProvider getApiProvider() {
+        return apiProvider;
     }
 
     public Gson getGson() {
         return gson;
+    }
+
+    public String getServerId() {
+        return this.configProvider.getConfigData().getServerId();
     }
 }

@@ -49,6 +49,10 @@ public class ConfigProvider {
     private void loadConfig() {
         final String serverId = this.plugin.getConfig().getString("server.id");
 
+        if (serverId != null && serverId.equals("all")) {
+            throw new IllegalArgumentException("Keyword all is prohibited in server id!");
+        }
+
         this.configData = new ConfigData(serverId);
     }
 

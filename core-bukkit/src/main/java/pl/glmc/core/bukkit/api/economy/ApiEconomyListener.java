@@ -1,24 +1,27 @@
-/*package pl.glmc.core.bukkit.api;
+package pl.glmc.core.bukkit.api.economy;
 
-import redis.clients.jedis.JedisPubSub;
+import pl.glmc.api.common.packet.listener.PacketListener;
+import pl.glmc.core.bukkit.GlmcCoreBukkit;
+import pl.glmc.core.common.packets.LocalPacketRegistry;
+import pl.glmc.core.common.packets.economy.BalanceUpdated;
 
-import java.util.UUID;
-
-public class ApiEconomyListener extends JedisPubSub {
-
+public class ApiEconomyListener extends PacketListener<BalanceUpdated> {
+    private final GlmcCoreBukkit plugin;
     private final ApiEconomyProvider apiEconomyProvider;
 
-    public ApiEconomyListener(ApiEconomyProvider apiEconomyProvider) {
+    public ApiEconomyListener(final GlmcCoreBukkit plugin, final ApiEconomyProvider apiEconomyProvider) {
+        super(LocalPacketRegistry.ECONOMY.BALANCE_UPDATED, BalanceUpdated.class);
+
         this.apiEconomyProvider = apiEconomyProvider;
+        this.plugin = plugin;
+
+        this.plugin.getApiProvider().getPacketService().registerListener(this, apiEconomyProvider.getEconomyConfig().getName());
     }
 
     @Override
-    public void onMessage(String channel, String message) {
-        UUID accountUUID = UUID.fromString(message);
-
-        if (this.apiEconomyProvider.isCached(accountUUID) && !this.apiEconomyProvider.checkRefreshIgnored(accountUUID)) {
-            this.apiEconomyProvider.refreshCachedData(accountUUID);
+    public void received(BalanceUpdated packet) { //todo add registering uuid cache
+        if (this.apiEconomyProvider.isCached(packet.getAccountUniqueId())) {
+            this.apiEconomyProvider.updateBalance(packet.getAccountUniqueId(), packet.getBalance());
         }
     }
 }
-*/

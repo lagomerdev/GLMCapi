@@ -3,6 +3,7 @@ package pl.glmc.core.bungee.api;
 import net.md_5.bungee.api.ChatColor;
 import pl.glmc.api.bungee.GlmcApiBungee;
 import pl.glmc.api.bungee.GlmcApiBungeeProvider;
+import pl.glmc.api.bungee.server.ServerManager;
 import pl.glmc.api.common.LuckPermsHook;
 import pl.glmc.api.common.economy.Economy;
 import pl.glmc.api.common.economy.EconomyFactory;
@@ -13,32 +14,47 @@ import pl.glmc.core.bungee.api.economy.local.LocalEconomy;
 import pl.glmc.core.bungee.api.hook.ApiLuckPermsHook;
 import pl.glmc.core.bungee.api.packet.ApiNetworkService;
 import pl.glmc.core.bungee.api.packet.ApiPacketService;
+import pl.glmc.core.bungee.api.server.ApiServerManager;
+
+import java.math.BigDecimal;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class GlmcApiProvider implements GlmcApiBungee {
     private final GlmcCoreBungee plugin;
 
-    private final ApiLuckPermsHook luckPermsHook;
+    private ApiLuckPermsHook luckPermsHook;
 
-    private final ApiEconomyFactory economyFactory;
-    private final LocalEconomy localEconomy;
+    private ApiEconomyFactory economyFactory;
+    private LocalEconomy localEconomy;
 
-    private final ApiPacketService packetService;
-    private final ApiNetworkService networkService;
+    private ApiPacketService packetService;
+    private ApiNetworkService networkService;
+
+    private ApiServerManager serverManager;
 
     public GlmcApiProvider(GlmcCoreBungee plugin) {
         this.plugin = plugin;
+    }
+
+    public void load() {
+        this.packetService = new ApiPacketService(this.plugin);
+        this.networkService = new ApiNetworkService(this.plugin, this.packetService);
 
         this.luckPermsHook = new ApiLuckPermsHook(this.plugin);
 
         this.economyFactory = new ApiEconomyFactory(this.plugin);
-        this.localEconomy = new LocalEconomy(this.plugin, this);
+        this.localEconomy = new LocalEconomy(this.plugin);
 
-        this.packetService = new ApiPacketService(this.plugin);
-        this.networkService = new ApiNetworkService(this.plugin, this.packetService);
+        this.serverManager = new ApiServerManager(this.plugin);
 
         GlmcApiBungeeProvider.register(this);
 
         this.plugin.getLogger().info(ChatColor.DARK_GREEN + "Loaded Bungee API Provider");
+
+        this.plugin.getProxy().getScheduler().schedule(this.plugin, () -> {
+            this.localEconomy.getPlayerBankEconomy().add(UUID.fromString("5d689771-1ffd-4513-82b8-b58d3f8540da"), new BigDecimal("1000.69"));
+        }, 10, TimeUnit.SECONDS);
     }
 
     @Override
@@ -58,11 +74,16 @@ public class GlmcApiProvider implements GlmcApiBungee {
 
     @Override
     public Economy getPlayerCashEconomy() {
-        return this.localEconomy.getPlayerBankEconomy();
+        return this.localEconomy.getPlayerCashEconomy();
     }
 
     @Override
     public PacketService getPacketService() {
         return this.packetService;
+    }
+
+    @Override
+    public ServerManager getServerManager() {
+        return this.serverManager;
     }
 }

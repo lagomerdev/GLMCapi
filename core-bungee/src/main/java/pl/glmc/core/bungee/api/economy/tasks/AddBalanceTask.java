@@ -30,7 +30,7 @@ public class AddBalanceTask implements Runnable {
             return;
         }
 
-        boolean success = this.apiEconomyProvider.insertLog(accountUUID, amount, true);
+        boolean success = this.apiEconomyProvider.insertLog(accountUUID, amount, 1);
 
         response.complete(success);
     }

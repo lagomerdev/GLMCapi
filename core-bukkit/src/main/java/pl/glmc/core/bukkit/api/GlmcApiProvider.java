@@ -7,25 +7,45 @@ import pl.glmc.api.common.LuckPermsHook;
 import pl.glmc.api.common.economy.Economy;
 import pl.glmc.api.common.economy.EconomyFactory;
 import pl.glmc.api.common.packet.PacketService;
+import pl.glmc.api.common.server.Server;
 import pl.glmc.core.bukkit.GlmcCoreBukkit;
+import pl.glmc.core.bukkit.api.economy.ApiEconomyFactory;
+import pl.glmc.core.bukkit.api.economy.local.LocalEconomy;
 import pl.glmc.core.bukkit.api.hook.ApiLuckPermsHook;
 import pl.glmc.core.bukkit.api.packet.ApiNetworkService;
 import pl.glmc.core.bukkit.api.packet.ApiPacketService;
+import pl.glmc.core.bukkit.api.server.ServerManager;
+import pl.glmc.core.common.packets.server.ServerRegistrationRequest;
 
 public class GlmcApiProvider implements GlmcApiBukkit {
     private final GlmcCoreBukkit plugin;
 
-    private final LuckPermsHook luckPermsHook;
-    private final ApiPacketService packetService;
-    private final ApiNetworkService networkService;
+    private ApiPacketService packetService;
+    private ApiNetworkService networkService;
+
+    private ApiEconomyFactory economyFactory;
+    private LocalEconomy localEconomy;
+
+    private LuckPermsHook luckPermsHook;
+
+    private ServerManager serverManager;
+
 
     public GlmcApiProvider(GlmcCoreBukkit plugin) {
         this.plugin = plugin;
+    }
+
+    public void load() {
+        this.packetService = new ApiPacketService(this.plugin);
+        this.networkService = new ApiNetworkService(this.plugin, this.packetService);
 
         this.luckPermsHook = new ApiLuckPermsHook(this.plugin);
 
-        this.packetService = new ApiPacketService(this.plugin);
-        this.networkService = new ApiNetworkService(this.plugin, this.packetService);
+        this.economyFactory = new ApiEconomyFactory(this.plugin);
+        this.localEconomy = new LocalEconomy(this.plugin);
+
+        this.serverManager = new ServerManager(this.plugin);
+
         GlmcApiBukkitProvider.register(this);
 
         this.plugin.getLogger().info(ChatColor.DARK_GREEN + "Loaded API Provider");
@@ -38,17 +58,17 @@ public class GlmcApiProvider implements GlmcApiBukkit {
 
     @Override
     public EconomyFactory getEconomyFactory() {
-        return null;
+        return this.economyFactory;
     }
 
     @Override
     public Economy getPlayerBankEconomy() {
-        return null;
+        return this.localEconomy.getPlayerBankEconomy();
     }
 
     @Override
     public Economy getPlayerCashEconomy() {
-        return null;
+        return this.localEconomy.getPlayerCashEconomy();
     }
 
     @Override

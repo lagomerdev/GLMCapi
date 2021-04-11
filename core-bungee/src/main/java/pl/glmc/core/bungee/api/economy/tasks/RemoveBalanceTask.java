@@ -38,7 +38,7 @@ public class RemoveBalanceTask implements Runnable {
             return;
         }
 
-        boolean success = this.apiEconomyProvider.insertLog(accountUUID, amount, false);
+        boolean success = this.apiEconomyProvider.insertLog(accountUUID, amount, 0);
 
         response.complete(success);
     }

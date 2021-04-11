@@ -1,5 +1,7 @@
 package pl.glmc.api.common.packet;
 
+import pl.glmc.api.common.packet.listener.PacketListener;
+
 public interface PacketService {
 
     /**
@@ -12,9 +14,24 @@ public interface PacketService {
 
     /**
      *
+     * @param packet
+     * @param target
+     * @param additionalId
+     */
+    void sendPacket(Packet packet, String target, String additionalId);
+
+    /**
+     *
      * @param packetListener
      */
     void registerListener(PacketListener<? extends Packet> packetListener);
+
+    /**
+     *
+     * @param packetListener
+     * @param additionalId
+     */
+    void registerListener(PacketListener<? extends Packet> packetListener, String additionalId);
 
     /**
      *

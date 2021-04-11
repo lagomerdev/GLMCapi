@@ -11,22 +11,20 @@ import java.util.UUID;
 
 public class LocalEconomy {
     private final GlmcCoreBungee plugin;
-    private final GlmcApiProvider glmcApiProvider;
 
     private final Economy playerBankEconomy, playerCashEconomy;
 
-    public LocalEconomy(GlmcCoreBungee plugin, GlmcApiProvider glmcApiProvider) {
+    public LocalEconomy(GlmcCoreBungee plugin) {
         this.plugin = plugin;
-        this.glmcApiProvider = glmcApiProvider;
 
         EconomyConfig playerBankConfig = new EconomyConfig("bank", EconomyType.BANK);
-        this.playerBankEconomy = this.glmcApiProvider.getEconomyFactory().registerEconomy(playerBankConfig);
+        this.playerBankEconomy = this.plugin.getApiProvider().getEconomyFactory().loadEconomy(playerBankConfig);
 
         LocalEconomyCacheListener playerBankCacheListener = new LocalEconomyCacheListener(this.playerBankEconomy);
         this.plugin.getProxy().getPluginManager().registerListener(this.plugin, playerBankCacheListener);
 
         EconomyConfig playerCashConfig = new EconomyConfig("cash", EconomyType.CASH);
-        this.playerCashEconomy = this.glmcApiProvider.getEconomyFactory().registerEconomy(playerCashConfig);
+        this.playerCashEconomy = this.plugin.getApiProvider().getEconomyFactory().loadEconomy(playerCashConfig);
 
         LocalEconomyCacheListener playerCashCacheListener = new LocalEconomyCacheListener(this.playerCashEconomy);
         this.plugin.getProxy().getPluginManager().registerListener(this.plugin, playerCashCacheListener);

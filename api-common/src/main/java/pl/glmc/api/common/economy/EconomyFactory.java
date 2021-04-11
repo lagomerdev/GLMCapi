@@ -2,17 +2,30 @@ package pl.glmc.api.common.economy;
 
 import pl.glmc.api.common.config.EconomyConfig;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface EconomyFactory {
 
     /**
-     * Registers economy with given EconomyConfig
      *
-     * @param economyConfig economy settings
-     * @return registered economy instance
+     * @param economyListener
      */
-    Economy registerEconomy(final EconomyConfig economyConfig);
+    void registerListener(final EconomyListener economyListener);
+
+    /**
+     *
+     * @param economyConfig
+     */
+    void registerEconomy(final EconomyConfig economyConfig);
+
+    /**
+     *
+     * @param economyConfig
+     * @return
+     */
+    Economy loadEconomy(final EconomyConfig economyConfig);
 
     /*
       Unregisters economy with given economyName
@@ -27,6 +40,12 @@ public interface EconomyFactory {
      * @return registered economies
      */
     ConcurrentHashMap<String, Economy> getRegisteredEconomies();
+
+    /**
+     *
+     * @return
+     */
+    HashSet<EconomyConfig> getRegisteredConfigs();
 
     /**
      * Gets economy with given name

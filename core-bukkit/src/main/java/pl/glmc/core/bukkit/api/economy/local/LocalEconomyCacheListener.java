@@ -1,4 +1,4 @@
-/*package pl.glmc.core.bungee.api.economy;
+package pl.glmc.core.bukkit.api.economy.local;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -8,13 +8,11 @@ import pl.glmc.api.common.economy.Economy;
 
 import java.util.UUID;
 
-public class LocalCacheListener implements Listener {
+public class LocalEconomyCacheListener implements Listener {
     private final Economy apiEconomyProvider;
-    private final LocalEconomy localEconomy;
 
-    public LocalCacheListener(Economy economy, LocalEconomy localEconomy) {
+    public LocalEconomyCacheListener(Economy economy) {
         this.apiEconomyProvider = economy;
-        this.localEconomy = localEconomy;
     }
 
     @EventHandler
@@ -32,4 +30,4 @@ public class LocalCacheListener implements Listener {
             this.apiEconomyProvider.removeFromCache(playerUUID);
         }
     }
-}*/
+}

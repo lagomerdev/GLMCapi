@@ -1,5 +1,6 @@
 package pl.glmc.api.bungee;
 
+import pl.glmc.api.bungee.server.ServerManager;
 import pl.glmc.api.common.LuckPermsHook;
 import pl.glmc.api.common.economy.Economy;
 import pl.glmc.api.common.economy.EconomyFactory;
@@ -41,4 +42,10 @@ public interface GlmcApiBungee {
      * @return
      */
     PacketService getPacketService();
+
+    /**
+     *
+     * @return
+     */
+    ServerManager getServerManager();
 }

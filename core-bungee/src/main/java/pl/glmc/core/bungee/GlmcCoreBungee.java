@@ -5,9 +5,13 @@ import net.md_5.bungee.api.plugin.Plugin;
 import pl.glmc.api.bungee.database.DatabaseProvider;
 import pl.glmc.api.bungee.database.RedisProvider;
 import pl.glmc.core.bungee.api.GlmcApiProvider;
+import pl.glmc.core.bungee.cmd.economy.BalanceCommand;
+import pl.glmc.core.bungee.cmd.economy.BaltopCommand;
+import pl.glmc.core.bungee.cmd.economy.EconomyCommand;
 import pl.glmc.core.bungee.config.ConfigProvider;
 
 public class GlmcCoreBungee extends Plugin {
+    private GlmcApiProvider apiProvider;
 
     private ConfigProvider configProvider;
     private DatabaseProvider databaseProvider;
@@ -26,7 +30,12 @@ public class GlmcCoreBungee extends Plugin {
 
     @Override
     public void onEnable() {
-        GlmcApiProvider glmcApiProvider = new GlmcApiProvider(this);
+        this.apiProvider = new GlmcApiProvider(this);
+        this.apiProvider.load();
+
+        BalanceCommand balanceCommand = new BalanceCommand(this);
+        BaltopCommand baltopCommand = new BaltopCommand(this);
+        EconomyCommand economyCommand = new EconomyCommand(this);
     }
 
     @Override
@@ -49,5 +58,13 @@ public class GlmcCoreBungee extends Plugin {
 
     public Gson getGson() {
         return gson;
+    }
+
+    public GlmcApiProvider getApiProvider() {
+        return apiProvider;
+    }
+
+    public String getServerId() {
+        return "proxy";
     }
 }

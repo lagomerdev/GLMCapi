@@ -4,6 +4,7 @@ import pl.glmc.api.common.EconomyType;
 import pl.glmc.api.common.config.EconomyConfig;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -37,12 +38,35 @@ public interface Economy {
     boolean isCached(UUID accountUUID);
 
     /**
+     *
+     * @param accountUUID
+     * @return
+     */
+    CompletableFuture<Boolean> accountExists(UUID accountUUID);
+
+    /**
      * Gets account's balance
      *
      * @param accountUUID account's unique identifier
      * @return account's balance
      */
     CompletableFuture<BigDecimal> getBalance(UUID accountUUID);
+
+    /**
+     *
+     * @param accountUUID
+     * @param sortingMode
+     * @param orderBy
+     * @return
+     */
+    CompletableFuture<TransactionLog> getTransactionLog(UUID accountUUID, int limit, TransactionLog.SortingMode sortingMode, TransactionLog.OrderBy orderBy);
+
+    /**
+     *
+     * @param accountUUID
+     * @return
+     */
+    CompletableFuture<Boolean> createAccount(UUID accountUUID);
 
     /**
      * Adds given amount to player's balance
@@ -61,6 +85,14 @@ public interface Economy {
      * @return transaction status
      */
     CompletableFuture<Boolean> remove(UUID accountUUID, BigDecimal amount);
+
+    /**
+     *
+     * @param accountUUID
+     * @param amount
+     * @return
+     */
+    CompletableFuture<Boolean> set(UUID accountUUID, BigDecimal amount);
 
     /**
      * Transfers given amount from current economy to other
@@ -82,13 +114,6 @@ public interface Economy {
      * @return transaction status
      */
     CompletableFuture<Boolean> transfer(UUID accountUUID, UUID targetUUID, BigDecimal amount, Economy economy);
-
-    /**
-     * Resets player balance
-     *
-     * @param accountUUID account's unique identifier
-     */
-    void reset(UUID accountUUID);
 
     /**
      * Gets account's balance

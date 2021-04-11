@@ -1,5 +1,6 @@
 package pl.glmc.core.bungee.api.packet;
 
+import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
 import pl.glmc.core.bungee.GlmcCoreBungee;
 import redis.clients.jedis.JedisPubSub;
@@ -21,6 +22,8 @@ public class ApiNetworkService extends JedisPubSub {
 
     @Override
     public void onPMessage(String pattern, String channel, String message) {
+        //System.out.println(ChatColor.BLUE + "Received " + System.currentTimeMillis());
+
         String packetChannel = StringUtils.replaceOnce(channel, this.baseChannel, "");
 
         this.packetService.packetReceived(packetChannel, message);

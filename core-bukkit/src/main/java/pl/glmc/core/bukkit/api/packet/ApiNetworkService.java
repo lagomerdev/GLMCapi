@@ -17,12 +17,17 @@ public class ApiNetworkService extends JedisPubSub {
 
         this.baseChannel = this.plugin.getConfigProvider().getConfigData().getServerId() + ".";
 
-        this.plugin.getRedisProvider().psubscribe(this, this.baseChannel + "*");
+        this.plugin.getRedisProvider().psubscribe(this, this.baseChannel + "*", "all.*");
     }
 
     @Override
     public void onPMessage(String pattern, String channel, String message) {
-        String packetChannel = StringUtils.replaceOnce(channel, this.baseChannel, "");
+        //System.out.println(ChatColor.BLUE + "Received " + System.currentTimeMillis());
+
+        String rawPattern = StringUtils.replace(pattern, "*", "");
+        String packetChannel = StringUtils.replace(channel, rawPattern, "");
+
+        this.plugin.getLogger().info(ChatColor.YELLOW + "Raw pattern: " + ChatColor.GOLD + rawPattern);
 
         this.packetService.packetReceived(packetChannel, message);
     }
