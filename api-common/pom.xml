@@ -7,7 +7,7 @@
     <parent>
         <artifactId>glmc-api</artifactId>
         <groupId>pl.glmc</groupId>
-        <version>0.2.0-alpha</version>
+        <version>0.3.0-beta</version>
     </parent>
 
     <name>GlmcAPICommon</name>

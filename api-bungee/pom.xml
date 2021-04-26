@@ -7,7 +7,7 @@
     <parent>
         <artifactId>glmc-api</artifactId>
         <groupId>pl.glmc</groupId>
-        <version>0.2.0-alpha</version>
+        <version>0.3.0-beta</version>
     </parent>
 
     <name>GlmcAPIBungee</name>
@@ -61,7 +61,7 @@
         <dependency>
             <groupId>pl.glmc</groupId>
             <artifactId>glmc-api-common</artifactId>
-            <version>0.2.0-alpha</version>
+            <version>0.3.0-beta</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
