@@ -20,15 +20,15 @@ public class ApiEconomyFactory implements EconomyFactory {
     private final GlmcCoreBukkit plugin;
     private final EconomyRegistrationHandler registrationHandler;
     private final ConcurrentHashMap<String, Economy> registeredEconomies;
-    private final List<EconomyConfig> registeredConfigs;
-    private final List<EconomyListener> registeredListeners;
+    private final HashSet<EconomyConfig> registeredConfigs;
+    private final HashSet<EconomyListener> registeredListeners;
 
     public ApiEconomyFactory(final GlmcCoreBukkit plugin) {
         this.plugin = plugin;
 
         this.registeredEconomies = new ConcurrentHashMap<>();
-        this.registeredConfigs = new ArrayList<>();
-        this.registeredListeners = new ArrayList<>();
+        this.registeredConfigs = new HashSet<>();
+        this.registeredListeners = new HashSet<>();
         this.registrationHandler = new EconomyRegistrationHandler(this.plugin);
 
         EconomyRegisteredListener registeredListener = new EconomyRegisteredListener(this.plugin);
@@ -108,7 +108,7 @@ public class ApiEconomyFactory implements EconomyFactory {
 
     @Override
     public HashSet<EconomyConfig> getRegisteredConfigs() {
-        return null;
+        return this.registeredConfigs;
     }
 
     @Override

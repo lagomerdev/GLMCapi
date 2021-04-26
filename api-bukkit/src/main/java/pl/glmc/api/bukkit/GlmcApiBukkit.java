@@ -1,5 +1,6 @@
 package pl.glmc.api.bukkit;
 
+import pl.glmc.api.bukkit.user.UserManager;
 import pl.glmc.api.common.LuckPermsHook;
 import pl.glmc.api.common.economy.Economy;
 import pl.glmc.api.common.economy.EconomyFactory;
@@ -41,4 +42,10 @@ public interface GlmcApiBukkit {
      * @return
      */
     PacketService getPacketService();
+
+    /**
+     *
+     * @return
+     */
+    UserManager getUserManager();
 }

@@ -3,6 +3,7 @@ package pl.glmc.core.bukkit.api;
 import org.bukkit.ChatColor;
 import pl.glmc.api.bukkit.GlmcApiBukkit;
 import pl.glmc.api.bukkit.GlmcApiBukkitProvider;
+import pl.glmc.api.bukkit.user.UserManager;
 import pl.glmc.api.common.LuckPermsHook;
 import pl.glmc.api.common.economy.Economy;
 import pl.glmc.api.common.economy.EconomyFactory;
@@ -74,5 +75,10 @@ public class GlmcApiProvider implements GlmcApiBukkit {
     @Override
     public PacketService getPacketService() {
         return this.packetService;
+    }
+
+    @Override
+    public UserManager getUserManager() {
+        return null;
     }
 }

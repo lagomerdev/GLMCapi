@@ -10,6 +10,7 @@ import net.md_5.bungee.protocol.packet.Chat;
 import pl.glmc.core.bungee.GlmcCoreBungee;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.UUID;
 
 public class BalanceCommand extends Command {
@@ -78,8 +79,8 @@ public class BalanceCommand extends Command {
         }
 
         TextComponent response = new TextComponent();
-        response.addExtra( ChatColor.YELLOW + "Stan konta: " + ChatColor.GOLD + bankBalance + "\n");
-        response.addExtra(ChatColor.YELLOW + "Przy sobie: " + ChatColor.GOLD + cashBalance);
+        response.addExtra( ChatColor.YELLOW + "Stan konta: " + ChatColor.GOLD + this.plugin.getApiProvider().getPlayerBankEconomy().getDecimalFormat().format(bankBalance) + "\n");
+        response.addExtra(ChatColor.YELLOW + "Przy sobie: " + ChatColor.GOLD + this.plugin.getApiProvider().getPlayerCashEconomy().getDecimalFormat().format(cashBalance));
 
         sender.sendMessage(response);
     }

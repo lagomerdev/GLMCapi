@@ -12,6 +12,7 @@ import pl.glmc.core.bungee.api.economy.tasks.AddBalanceTask;
 import pl.glmc.core.bungee.api.economy.tasks.CreateAccountTask;
 import pl.glmc.core.bungee.api.economy.tasks.RemoveBalanceTask;
 import pl.glmc.core.bungee.api.economy.tasks.SetBalanceTask;
+import pl.glmc.core.bungee.api.user.ApiUserManager;
 import pl.glmc.core.common.packets.economy.BalanceUpdated;
 
 import javax.sql.rowset.CachedRowSet;
@@ -20,6 +21,9 @@ import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -40,6 +44,8 @@ public class ApiEconomyProvider implements Economy {
     private final BalanceSetListener balanceSetListener;
     private final TransactionLogListener transactionLogListener;
 
+    private final DecimalFormat decimalFormat;
+
     public ApiEconomyProvider(GlmcCoreBungee plugin, EconomyConfig economyConfig) {
         this.plugin = plugin;
         this.economyConfig = economyConfig;
@@ -56,6 +62,9 @@ public class ApiEconomyProvider implements Economy {
         this.balanceTransferListener = new BalanceTransferListener(this.plugin, this);
         this.balanceSetListener = new BalanceSetListener(this.plugin, this);
         this.transactionLogListener = new TransactionLogListener(this.plugin, this);
+
+        this.decimalFormat = (DecimalFormat) NumberFormat.getNumberInstance(Locale.forLanguageTag("pl_PL"));
+        this.decimalFormat.applyLocalizedPattern("###,###.## " + economyConfig.getCurrencySign());
 
         this.plugin.getLogger().info(ChatColor.GREEN + "Created Economy " + economyConfig.getName());
     }
@@ -243,9 +252,10 @@ public class ApiEconomyProvider implements Economy {
     public CompletableFuture<TransactionLog> getTransactionLog(UUID accountUUID, int limit, TransactionLog.SortingMode sortingMode, TransactionLog.OrderBy orderBy) {
         final CompletableFuture<TransactionLog> result = new CompletableFuture<>();
 
-        this.plugin.getDatabaseProvider().getAsync((rs, throwable) -> {
+        this.plugin.getDatabaseProvider().getAsync((rs) -> {
             try {
                 LinkedHashSet<Transaction> transactions = new LinkedHashSet<>();
+
                 while (rs.next()) {
                     BigDecimal amount = rs.getBigDecimal("amount");
                     int action = rs.getInt("action");
@@ -378,5 +388,10 @@ public class ApiEconomyProvider implements Economy {
     @Override
     public EconomyType getEconomyType() {
         return this.economyConfig.getEconomyType();
+    }
+
+    @Override
+    public DecimalFormat getDecimalFormat() {
+        return this.decimalFormat;
     }
 }

@@ -3,6 +3,7 @@ package pl.glmc.api.bungee.database;
 import com.zaxxer.hikari.HikariDataSource;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.plugin.Plugin;
+import pl.glmc.api.common.Callback;
 import pl.glmc.api.common.config.DatabaseConfig;
 
 import javax.sql.rowset.CachedRowSet;
@@ -132,6 +133,7 @@ public class DatabaseProvider {
 
             CachedRowSet crs = rowSetFactory.createCachedRowSet();
             crs.populate(query.executeQuery());
+
             return crs;
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -147,19 +149,19 @@ public class DatabaseProvider {
      * @param statement sql statement to execute
      * @param params parameters to apply
      */
-    public void getAsync(final Callback<ResultSet, Throwable> callback, final String statement, final Object... params) {
+    public void getAsync(final Callback<ResultSet> callback, final String statement, final Object... params) {
         this.plugin.getProxy().getScheduler().runAsync(this.plugin, () -> {
             try (final Connection connection = this.dataSource.getConnection()) {
                 final PreparedStatement query = connection.prepareStatement(statement);
                 this.applyParams(query, params);
 
-                callback.done(query.executeQuery(), null);
+                callback.done(query.executeQuery());
 
                 query.close();
             } catch (SQLException exception) {
                 exception.printStackTrace();
 
-                callback.done(null, exception);
+                callback.done(null);
             }
         });
     }
@@ -183,9 +185,5 @@ public class DatabaseProvider {
      */
     public HikariDataSource getDataSource() {
         return this.dataSource;
-    }
-
-    public interface Callback<ResultSet, Throwable> {
-        void done(ResultSet resultSet, Throwable throwable);
     }
 }

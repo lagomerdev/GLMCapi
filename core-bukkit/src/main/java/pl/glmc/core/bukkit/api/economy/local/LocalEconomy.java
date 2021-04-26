@@ -21,8 +21,6 @@ public class LocalEconomy implements EconomyListener {
         this.plugin = plugin;
 
         this.plugin.getApiProvider().getEconomyFactory().registerListener(this);
-
-        TestListener testListener = new TestListener(this.plugin, this);
     }
 
     public Economy getPlayerBankEconomy() {

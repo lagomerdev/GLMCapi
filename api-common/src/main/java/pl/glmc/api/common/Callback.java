@@ -1,5 +1,5 @@
 package pl.glmc.api.common;
 
-public interface Callback<T, E> {
-    void done(T callback, E throwable);
+public interface Callback<T> {
+    void done(T callback);
 }

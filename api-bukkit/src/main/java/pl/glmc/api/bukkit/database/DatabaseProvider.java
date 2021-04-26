@@ -148,19 +148,19 @@ public class DatabaseProvider {
      * @param statement sql statement to execute
      * @param params parameters to apply
      */
-    public void getAsync(final Callback<ResultSet, Throwable> callback, final String statement, final Object... params) {
+    public void getAsync(final Callback<ResultSet> callback, final String statement, final Object... params) {
         this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
             try (final Connection connection = this.dataSource.getConnection()) {
                 final PreparedStatement query = connection.prepareStatement(statement);
                 this.applyParams(query, params);
 
-                callback.done(query.executeQuery(), null);
+                callback.done(query.executeQuery());
 
                 query.close();
             } catch (SQLException exception) {
                 exception.printStackTrace();
 
-                callback.done(null, exception);
+                callback.done(null);
             }
         });
     }

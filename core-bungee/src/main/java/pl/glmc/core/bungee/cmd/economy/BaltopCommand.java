@@ -1,11 +1,13 @@
 package pl.glmc.core.bungee.cmd.economy;
 
+import com.google.common.collect.Multimap;
 import net.luckperms.api.model.user.User;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 import org.apache.commons.lang.StringUtils;
 import pl.glmc.core.bungee.GlmcCoreBungee;
 import pl.glmc.core.bungee.api.economy.ApiEconomyProvider;
@@ -17,16 +19,18 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-public class BaltopCommand extends Command {
-    private final static int PER_PAGE = 10;
-    private final static DateTimeFormatter LAST_REFRESHED_FORMATTER = DateTimeFormatter.ofPattern("d/M/uu H:mm:ss");
+public class BaltopCommand extends Command implements TabExecutor {
+    private static final int PER_PAGE = 10;
+    private static final DateTimeFormatter LAST_REFRESHED_FORMATTER = DateTimeFormatter.ofPattern("d/M/uu H:mm:ss");
+    private static final List<String> PARAMS = List.of("--force");
 
     private final GlmcCoreBungee plugin;
 
     private LocalDateTime lastRefresh;
-    private LinkedHashMap<UUID, BigDecimal> topBalance;
+    private LinkedHashMap<String, BigDecimal> topBalance;
     private int pages;
 
     public BaltopCommand(final GlmcCoreBungee plugin) {
@@ -34,18 +38,30 @@ public class BaltopCommand extends Command {
 
         this.plugin = plugin;
 
-        this.lastRefresh = new Timestamp(new Date().getTime()).toLocalDateTime();
-        this.topBalance = new LinkedHashMap<>();
+        this.calculateBalanceTop()
+                .thenAccept(success -> {
+                    if (success) {
+                        this.plugin.getProxy().getPluginManager().registerCommand(this.plugin, this);
+                    } else {
+                        this.plugin.getLogger().warning(ChatColor.RED + "Failed to calculate baltop...");
+                    }
+                });
+    }
 
-        this.plugin.getProxy().getPluginManager().registerCommand(this.plugin, this);
+    @Override
+    public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+        if (sender.hasPermission("economy.baltop.force")
+                && Arrays.stream(args).noneMatch(arg -> arg.equalsIgnoreCase("--force"))) {
+            return PARAMS;
+        }
 
-        this.calculateBalanceTop();
+        return new ArrayList<>();
     }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
         Timestamp currentTimestamp = new Timestamp(new Date().getTime());
-        boolean refresh = lastRefresh.plusMinutes(1).isBefore(currentTimestamp.toLocalDateTime());
+        boolean refresh = lastRefresh.plusMinutes(2).isBefore(currentTimestamp.toLocalDateTime());
 
         if (args.length > 0 && sender.hasPermission("economy.baltop.force")
                 && Arrays.stream(args).anyMatch(arg -> arg.equalsIgnoreCase("--force"))) {
@@ -74,14 +90,14 @@ public class BaltopCommand extends Command {
 
             if (page < 0) {
                 TextComponent errorResponse = new TextComponent();
-                errorResponse.addExtra(ChatColor.RED + "Number strony nie może być mniejszy niż 1!");
+                errorResponse.addExtra(ChatColor.RED + "Numer strony nie może być mniejszy niż 1!");
 
                 sender.sendMessage(errorResponse);
 
                 return;
-            } else if (page > this.pages) {
+            } else if (page >= this.pages) {
                 TextComponent errorResponse = new TextComponent();
-                errorResponse.addExtra(ChatColor.RED + "Number strony nie może być większy niż " + this.pages + "!");
+                errorResponse.addExtra(ChatColor.RED + "Numer strony nie może być większy niż " + this.pages + "!");
 
                 sender.sendMessage(errorResponse);
 
@@ -94,36 +110,22 @@ public class BaltopCommand extends Command {
         String lastRefreshTime = lastRefresh.format(LAST_REFRESHED_FORMATTER);
 
         TextComponent baltopResponse = new TextComponent();
-        baltopResponse.addExtra(ChatColor.GOLD + "Najbogatsi gracze na serwerze: " + ChatColor.GRAY + "(" + lastRefreshTime + ")");
+        baltopResponse.addExtra(ChatColor.GOLD + "Najbogatsi gracze na serwerze:");
+        baltopResponse.addExtra(ChatColor.DARK_GRAY  + " | " + ChatColor.YELLOW + (page + 1) + ChatColor.GRAY  + "/" + ChatColor.YELLOW + pages);
+        baltopResponse.addExtra(ChatColor.DARK_GRAY + " | " + ChatColor.GRAY + "(" + lastRefreshTime + ")");
 
         int position = 0;
-
-        for (Map.Entry<UUID, BigDecimal> sortedPosition : topBalance.entrySet()) {
+        for (Map.Entry<String, BigDecimal> sortedPosition : topBalance.entrySet()) {
             position++;
 
             if (position <= PER_PAGE * page) continue;
             else if (position > PER_PAGE * page + PER_PAGE) break;
 
-            ProxiedPlayer player = this.plugin.getProxy().getPlayer(sortedPosition.getKey());
-
-            String playerName;
-            if (player == null) {
-                //todo replace with own user cache for better performance
-                User user = this.plugin.getApiProvider().getLuckPermsHook().getLuckPerms().getUserManager().loadUser(sortedPosition.getKey()).join();
-
-                if (user.getUsername() == null) {
-                    playerName = sortedPosition.getKey().toString();
-                } else {
-                    playerName = user.getUsername();
-                }
-            } else {
-                playerName = player.getName();
-            }
-
-            baltopResponse.addExtra("\n" + ChatColor.GRAY + position + ". " + ChatColor.WHITE + playerName + ": " + ChatColor.YELLOW + NumberFormat.getNumberInstance().format(sortedPosition.getValue()));
+            baltopResponse.addExtra("\n" + ChatColor.GRAY + position + ". " + ChatColor.WHITE + sortedPosition.getKey() + ": " + ChatColor.YELLOW
+                    + this.plugin.getApiProvider().getPlayerBankEconomy().getDecimalFormat().format(sortedPosition.getValue()));
         }
-        if (sender.hasPermission("economy.baltop.all")) {
-            baltopResponse.addExtra("\n" + ChatColor.GOLD + "Strona " + ChatColor.YELLOW + (page + 1) + ChatColor.GRAY + "/" + ChatColor.YELLOW + pages + ChatColor.GOLD + ", aby przejść na kolejną użyj komendy /baltop " + (page + 2));
+        if (sender.hasPermission("economy.baltop.all") && (page+1) != this.pages) {
+            baltopResponse.addExtra("\n" + ChatColor.GRAY + "Aby przejść na kolejną stornę użyj komendy /baltop " + (page+2));
         }
 
         sender.sendMessage(baltopResponse);
@@ -133,32 +135,37 @@ public class BaltopCommand extends Command {
         CompletableFuture<Boolean> callback = new CompletableFuture<>();
 
         this.plugin.getProxy().getScheduler().runAsync(this.plugin, () -> {
-            ApiEconomyProvider bankEconomyProvider = (ApiEconomyProvider) this.plugin.getApiProvider().getPlayerBankEconomy();
-            ApiEconomyProvider cashEconomyProvider = (ApiEconomyProvider) this.plugin.getApiProvider().getPlayerCashEconomy();
+            try {
+                ApiEconomyProvider bankEconomyProvider = (ApiEconomyProvider) this.plugin.getApiProvider().getPlayerBankEconomy();
+                ApiEconomyProvider cashEconomyProvider = (ApiEconomyProvider) this.plugin.getApiProvider().getPlayerCashEconomy();
 
-            HashMap<UUID, BigDecimal> combined = new HashMap<>(bankEconomyProvider.getRegisteredAccounts());
+                HashMap<UUID, BigDecimal> combined = new HashMap<>(bankEconomyProvider.getRegisteredAccounts());
 
-            cashEconomyProvider.getRegisteredAccounts().forEach((uniqueId, balance) -> {
-                combined.compute(uniqueId, (currentUniqueId, currentBalance) -> {
-                    if (currentBalance == null) {
-                        return balance;
-                    } else {
-                        return currentBalance.add(balance);
-                    }
+                cashEconomyProvider.getRegisteredAccounts().forEach((uniqueId, balance) -> {
+                    combined.compute(uniqueId, (currentUniqueId, currentBalance) -> {
+                        if (currentBalance == null) {
+                            return balance;
+                        } else {
+                            return currentBalance.add(balance);
+                        }
+                    });
                 });
-            });
 
-            this.topBalance = combined.entrySet().stream()
-                    .sorted(Map.Entry.<UUID, BigDecimal>comparingByValue().reversed())
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key, value) -> key, LinkedHashMap::new));
+                this.topBalance = combined.entrySet().stream()
+                        .sorted(Map.Entry.<UUID, BigDecimal>comparingByValue().reversed())
+                        .limit(1000)
+                        .collect(Collectors.toMap(key -> this.plugin.getApiProvider().getUserManager().getUsername(key.getKey(), key.getKey().toString()), Map.Entry::getValue, (key, value) -> key, LinkedHashMap::new));
 
-            this.lastRefresh = new Timestamp(new Date().getTime()).toLocalDateTime();
+                this.lastRefresh = new Timestamp(new Date().getTime()).toLocalDateTime();
 
-            int entries = topBalance.size();;
+                int entries = topBalance.size();
 
-            this.pages = entries % PER_PAGE == 0 ? entries / PER_PAGE : (entries - entries % PER_PAGE) / PER_PAGE + 1;
+                this.pages = entries % PER_PAGE == 0 ? entries / PER_PAGE : (entries - entries % PER_PAGE) / PER_PAGE + 1;
 
-            callback.complete(true);
+                callback.complete(true);
+            } catch (Exception e) {
+                callback.complete(false);
+            }
         });
 
         return callback;

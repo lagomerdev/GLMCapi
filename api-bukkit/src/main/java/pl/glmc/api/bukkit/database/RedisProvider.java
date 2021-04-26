@@ -9,7 +9,9 @@ import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Redis API
@@ -181,26 +183,36 @@ public class RedisProvider {
     }
 
     /**
-     * Publishes redis string message
+     * Synchronously publishes redis string message
      *
      * @param channel redis channel
      * @param message string message to publish
      */
     public void publish(final String channel, final String message) {
-        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
-            try (Jedis jedis = this.jedisPool.getResource()) {
-                jedis.publish(channel, message);
-            }
-        });
+        try (Jedis jedis = this.jedisPool.getResource()) {
+            jedis.publish(channel, message);
+        }
     }
 
     /**
-     * Publishes redis binary message
+     * Synchronously publishes redis binary message
      *
      * @param channel redis channel
      * @param message byte[] message to publish
      */
     public void publish(final byte[] channel, final byte[] message) {
+        try (Jedis jedis = this.jedisPool.getResource()) {
+            jedis.publish(channel, message);
+        }
+    }
+
+    /**
+     * Asynchronously publishes redis string message
+     *
+     * @param channel redis channel
+     * @param message string message to publish
+     */
+    public void publishAsync(final String channel, final String message) {
         this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
             try (Jedis jedis = this.jedisPool.getResource()) {
                 jedis.publish(channel, message);
@@ -209,15 +221,179 @@ public class RedisProvider {
     }
 
     /**
-     * Sets key to given value
+     * Asynchronously publishes redis binary message
+     *
+     * @param channel redis channel
+     * @param message byte[] message to publish
+     */
+    public void publishAsync(final byte[] channel, final byte[] message) {
+        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            try (Jedis jedis = this.jedisPool.getResource()) {
+                jedis.publish(channel, message);
+            }
+        });
+    }
+
+    /**
+     * Synchronously sets key to given value
      *
      * @param key redis key
-     * @param value set value
+     * @param value value to set
      */
     public void set(final String key, final String value) {
+        try (Jedis jedis = this.jedisPool.getResource()) {
+            jedis.set(key, value);
+        }
+    }
+
+    /**
+     * Asynchronously sets key to given value
+     *
+     * @param key redis key
+     * @param value value to set
+     */
+    public void setAsync(final String key, final String value) {
         this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
             try (Jedis jedis = this.jedisPool.getResource()) {
                 jedis.set(key, value);
+            }
+        });
+    }
+
+    /**
+     * Synchronously sets map's field to given value
+     *
+     * @param key map's key
+     * @param field map's field
+     * @param value value to set
+     */
+    public void hset(final String key, final String field, final String value) {
+        try (Jedis jedis = this.jedisPool.getResource()) {
+            jedis.hset(key, field, value);
+        }
+    }
+
+    /**
+     * Asynchronously sets map's field to given value
+     *
+     * @param key map's key
+     * @param field map's field
+     * @param value value to set
+     */
+    public void hsetAsync(final String key, final String field, final String value) {
+        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            try (Jedis jedis = this.jedisPool.getResource()) {
+                jedis.hset(key, field, value);
+            }
+        });
+    }
+
+    /**
+     * Synchronously deletes map's given fields
+     *
+     * @param key map's key
+     * @param field fields to remove
+     */
+    public void hdel(final String key, final String... field) {
+        try (Jedis jedis = this.jedisPool.getResource()) {
+            jedis.hdel(key, field);
+        }
+    }
+
+    /**
+     * Asynchronously deletes map's given fields
+     *
+     * @param key map's key
+     * @param field fields to remove
+     */
+    public void hdelAsync(final String key, final String... field) {
+        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            try (Jedis jedis = this.jedisPool.getResource()) {
+                jedis.hdel(key, field);
+            }
+        });
+    }
+
+    /**
+     * Synchronously gets value of given field in map
+     *
+     * @param key map's key
+     * @param field value's field
+     * @return value of given field
+     */
+    public String hget(final String key, final String field) {
+        try (Jedis jedis = this.jedisPool.getResource()) {
+            return jedis.hget(key, field);
+        }
+    }
+
+    /**
+     * Asynchronously gets value of given field in map
+     *
+     * @param callback callback
+     * @param key map's key
+     * @param field value's field
+     * @return value of given field
+     */
+    public void hgetAsync(final Callback<String> callback, final String key, final String field) {
+        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            try (Jedis jedis = this.jedisPool.getResource()) {
+                callback.done(jedis.hget(key, field));
+            }
+        });
+    }
+
+    /**
+     * Synchronously gets map with fields and values of given key
+     *
+     * @param key map's key
+     * @return map with fields and their values assigned to given key
+     */
+    public Map<String, String> hgetAll(final String key) {
+       try (Jedis jedis = this.jedisPool.getResource()) {
+           return jedis.hgetAll(key);
+       }
+    }
+
+    /**
+     * Synchronously gets map with fields and values of given key
+     *
+     * @param callback callback
+     * @param key map's key
+     * @return map with fields and their values assigned to given key
+     */
+    public void hgetAllAsync(final Callback<Map<String, String>> callback, final String key) {
+        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            try (Jedis jedis = this.jedisPool.getResource()) {
+                callback.done(jedis.hgetAll(key));
+            }
+        });
+    }
+
+    /**
+     * Synchronously checks if field exists in map with given key
+     *
+     * @param key map's key
+     * @param field field to check
+     * @return true if field exists false if not
+     */
+    public boolean hexists(final String key, final String field) {
+        try (Jedis jedis = this.jedisPool.getResource()) {
+            return jedis.hexists(key, field);
+        }
+    }
+
+    /**
+     * Asynchronously checks if field exists in map with given key
+     *
+     * @param callback callback
+     * @param key map's key
+     * @param field field to check
+     */
+    public void hexistsAsync(final Callback<Boolean> callback, final String key, final String field) {
+        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            try (Jedis jedis = this.jedisPool.getResource()) {
+                callback.done(jedis.hexists(key, field));
             }
         });
     }
@@ -240,12 +416,12 @@ public class RedisProvider {
      * @param callback callback called when getting value is completed
      * @param key redis key
      */
-    public void getAsync(final Callback<String, Throwable> callback, final String key) {
+    public void getAsync(final Callback<String> callback, final String key) {
         this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
             try (Jedis jedis = this.jedisPool.getResource()) {
                 String result = jedis.get(key);
 
-                callback.done(result, null);
+                callback.done(result);
             }
         });
     }

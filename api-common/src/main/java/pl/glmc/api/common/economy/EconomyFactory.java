@@ -27,13 +27,6 @@ public interface EconomyFactory {
      */
     Economy loadEconomy(final EconomyConfig economyConfig);
 
-    /*
-      Unregisters economy with given economyName
-
-      @param economyName economy name
-
-    void unregisterEconomy(final String economyName);*/
-
     /**
      * Gets registered economies
      *

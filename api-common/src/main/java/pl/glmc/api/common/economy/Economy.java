@@ -4,6 +4,7 @@ import pl.glmc.api.common.EconomyType;
 import pl.glmc.api.common.config.EconomyConfig;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -137,4 +138,10 @@ public interface Economy {
      * @return current economy type
      */
     EconomyType getEconomyType();
+
+    /**
+     *
+     * @return
+     */
+    DecimalFormat getDecimalFormat();
 }

@@ -11,6 +11,9 @@ import pl.glmc.core.common.packets.LocalPacketRegistry;
 import pl.glmc.core.common.packets.economy.*;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +32,7 @@ public class ApiEconomyProvider implements Economy {
     private final BalanceInfoHandler balanceInfoHandler;
     private final TransactionLogHandler transactionLogHandler;
 
-    private ApiEconomyListener apiEconomyListener;
+    private final DecimalFormat decimalFormat;
 
     public ApiEconomyProvider(final GlmcCoreBukkit plugin, final EconomyConfig economyConfig) {
         this.plugin = plugin;
@@ -45,10 +48,13 @@ public class ApiEconomyProvider implements Economy {
         this.balanceSetHandler = new EconomyListener<>(LocalPacketRegistry.ECONOMY.BALANCE_SET_RESPONSE, BalanceSetResponse.class);
         this.balanceInfoHandler = new BalanceInfoHandler();
         this.transactionLogHandler = new TransactionLogHandler();
+
+        this.decimalFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pl_PL"));
+        this.decimalFormat.applyPattern("###,###.## " + economyConfig.getCurrencySign());
     }
 
     public void load() {
-        this.apiEconomyListener = new ApiEconomyListener(this.plugin, this);
+        ApiEconomyListener apiEconomyListener = new ApiEconomyListener(this.plugin, this);
 
         this.plugin.getApiProvider().getPacketService().registerListener(this.accountCreateHandler, this.economyConfig.getName());
         this.plugin.getApiProvider().getPacketService().registerListener(this.accountExistsHandler, this.economyConfig.getName());
@@ -96,9 +102,20 @@ public class ApiEconomyProvider implements Economy {
 
     @Override
     public CompletableFuture<Boolean> accountExists(UUID accountUUID) {
-        final AccountExistsRequest request = new AccountExistsRequest(accountUUID);
+        final CompletableFuture<Boolean> exists;
 
-        final CompletableFuture<Boolean> exists = this.accountExistsHandler.create(request.getUniqueId());
+        if (this.accountsCache.containsKey(accountUUID)) {
+            exists = new CompletableFuture<>();
+
+            exists.complete(true);
+        } else {
+            final AccountExistsRequest request = new AccountExistsRequest(accountUUID);
+
+            exists = this.accountExistsHandler.create(request.getUniqueId());
+
+            this.plugin.getApiProvider().getPacketService().sendPacket(request, "proxy", this.economyConfig.getName());
+        }
+
         exists.thenAccept(success -> {
             if (success) {
                 this.plugin.getLogger().info(ChatColor.GREEN + "Account " + accountUUID.toString() + " exists on economy " + this.economyConfig.getName());
@@ -107,7 +124,6 @@ public class ApiEconomyProvider implements Economy {
             }
         });
 
-        this.plugin.getApiProvider().getPacketService().sendPacket(request, "proxy", this.economyConfig.getName());
 
         return exists;
     }
@@ -259,5 +275,10 @@ public class ApiEconomyProvider implements Economy {
     @Override
     public EconomyType getEconomyType() {
         return this.economyConfig.getEconomyType();
+    }
+
+    @Override
+    public DecimalFormat getDecimalFormat() {
+        return this.decimalFormat;
     }
 }

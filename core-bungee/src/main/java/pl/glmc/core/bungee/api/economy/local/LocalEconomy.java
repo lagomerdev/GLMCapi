@@ -17,13 +17,13 @@ public class LocalEconomy {
     public LocalEconomy(GlmcCoreBungee plugin) {
         this.plugin = plugin;
 
-        EconomyConfig playerBankConfig = new EconomyConfig("bank", EconomyType.BANK);
+        EconomyConfig playerBankConfig = new EconomyConfig("bank", "G€", EconomyType.BANK);
         this.playerBankEconomy = this.plugin.getApiProvider().getEconomyFactory().loadEconomy(playerBankConfig);
 
         LocalEconomyCacheListener playerBankCacheListener = new LocalEconomyCacheListener(this.playerBankEconomy);
         this.plugin.getProxy().getPluginManager().registerListener(this.plugin, playerBankCacheListener);
 
-        EconomyConfig playerCashConfig = new EconomyConfig("cash", EconomyType.CASH);
+        EconomyConfig playerCashConfig = new EconomyConfig("cash", "G€", EconomyType.CASH);
         this.playerCashEconomy = this.plugin.getApiProvider().getEconomyFactory().loadEconomy(playerCashConfig);
 
         LocalEconomyCacheListener playerCashCacheListener = new LocalEconomyCacheListener(this.playerCashEconomy);

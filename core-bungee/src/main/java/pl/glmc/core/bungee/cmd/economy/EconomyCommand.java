@@ -26,7 +26,7 @@ public class EconomyCommand extends Command implements TabExecutor {
     private final static List<String> SUBCOMMANDS_COMPLETION_LIST = List.of("balance", "list", "give", "reset", "set", "subcommands", "take", "transactions");
     private final static List<String> ECONOMY_COMMANDS = List.of("balance", "give", "reset", "set", "take", "transactions");
     private final static List<String> BALANCE_COMMANDS = List.of("give", "reset", "set", "take");
-    private final static List<String> AMOUNT_SAMPLES = List.of("10.00", "50.00", "100.00", "250.00", "500.00", "1000.00", "500.00", "10000.00");
+    private final static List<String> AMOUNT_SAMPLES = List.of("10.00", "50.00", "100.00", "250.00", "500.00", "1000.00", "5000.00", "10000.00");
     private final static List<String> TRANSACTION_SAMPLES = List.of("5", "10", "15", "20", "25", "50");
 
     private final GlmcCoreBungee plugin;
@@ -46,6 +46,10 @@ public class EconomyCommand extends Command implements TabExecutor {
 
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("economy.admin")) {
+            return new ArrayList<>();
+        }
+
         if (args.length == 0) {
             return SUBCOMMANDS_COMPLETION_LIST;
         } else if (args.length == 1) {
@@ -56,7 +60,8 @@ public class EconomyCommand extends Command implements TabExecutor {
         } else if (args.length == 2 && ECONOMY_COMMANDS.contains(args[0].toLowerCase())) {
             String arg = args[1];
 
-            return this.plugin.getApiProvider().getEconomyFactory().getRegisteredConfigs().stream().map(EconomyConfig::getName).filter(param -> StringUtils.startsWithIgnoreCase(param, arg))
+            return this.plugin.getApiProvider().getEconomyFactory().getRegisteredConfigs().stream().map(EconomyConfig::getName)
+                    .filter(param -> StringUtils.startsWithIgnoreCase(param, arg))
                     .collect(Collectors.toSet());
         } else if (args.length == 3 && ECONOMY_COMMANDS.contains(args[0].toLowerCase())) {
             String arg = args[2];
@@ -67,36 +72,31 @@ public class EconomyCommand extends Command implements TabExecutor {
             } catch (NullPointerException | ClassCastException e) {
                 return new ArrayList<>();
             }
-
+            
             boolean isBasicEconomy = economyProvider.getEconomyConfig().getName().equals("bank") || economyProvider.getEconomyConfig().getName().equals("cash");
 
             Matcher matcher = completionUuidPattern.matcher(arg);
-            if (matcher.matches()) {
-                Set<String> accountUuids = economyProvider.getRegisteredAccounts().keySet().stream().map(UUID::toString).filter(param -> StringUtils.startsWithIgnoreCase(param, arg))
+            if (isBasicEconomy) {
+                return this.plugin.getApiProvider().getUserManager().getRegisteredUsernames().stream()
+                        .filter(param -> StringUtils.startsWithIgnoreCase(param, arg))
+                        .limit(25)
                         .collect(Collectors.toSet());
-
-                if (isBasicEconomy) {
-                    Set<String> playerNames = this.plugin.getProxy().getPlayers().stream().map(ProxiedPlayer::getName).filter(param -> StringUtils.startsWithIgnoreCase(param, arg))
-                            .collect(Collectors.toSet());
-
-                    accountUuids.addAll(playerNames);
-                }
-
-                return accountUuids;
-            } else if (isBasicEconomy) {
-                return this.plugin.getProxy().getPlayers().stream().map(ProxiedPlayer::getName).filter(param -> StringUtils.startsWithIgnoreCase(param, arg))
-                            .collect(Collectors.toSet());
-            }
+            } else if (matcher.matches()) {
+                return economyProvider.getRegisteredAccounts().keySet().stream().map(UUID::toString)
+                        .filter(param -> StringUtils.startsWithIgnoreCase(param, arg))
+                        .limit(25)
+                        .collect(Collectors.toSet());
+            } else return new ArrayList<>();
         } else if (args.length == 4 && BALANCE_COMMANDS.contains(args[0].toLowerCase())) {
             String arg = args[3];
 
             return AMOUNT_SAMPLES.stream().filter(param -> StringUtils.startsWithIgnoreCase(param, arg))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
         } else if (args.length == 4 && args[0].equalsIgnoreCase("transactions")) {
             String arg = args[3];
 
             return TRANSACTION_SAMPLES.stream().filter(param -> StringUtils.startsWithIgnoreCase(param, arg))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
         }
 
         return new ArrayList<>();
@@ -350,7 +350,7 @@ public class EconomyCommand extends Command implements TabExecutor {
         subcommands.addExtra("\n" + ChatColor.YELLOW + "/economy subcommands - " + ChatColor.GOLD + "zwraca listę wszystkich dostępnych subkomend");
         subcommands.addExtra("\n" + ChatColor.YELLOW + "/economy balance <economy> <account> - " + ChatColor.GOLD + "zwraca balans konta z danej ekonomii");
         subcommands.addExtra("\n" + ChatColor.YELLOW + "/economy reset <economy> <account> - " + ChatColor.GOLD + "resetuje balans konta na danej ekonomii");
-        subcommands.addExtra("\n" + ChatColor.YELLOW + "/economy transactions <economy> <account> (<amount>) - " + ChatColor.GOLD + "zwraca ostatnio wykonane transackcje");
+        subcommands.addExtra("\n" + ChatColor.YELLOW + "/economy transactions <economy> <account> [amount] - " + ChatColor.GOLD + "zwraca ostatnio wykonane transackcje");
         subcommands.addExtra("\n" + ChatColor.YELLOW + "/economy give <economy> <account> <balance> - " + ChatColor.GOLD + "dodaje podana sumę do balansu konta na danej ekonomii");
         subcommands.addExtra("\n" + ChatColor.YELLOW + "/economy take <economy> <account> <balance> - " + ChatColor.GOLD + "zabiera podana sumę z balansu konta na danej ekonomii");
         subcommands.addExtra("\n" + ChatColor.YELLOW + "/economy set <economy> <account> <balance> - " + ChatColor.GOLD + "ustawia dana sumę jako balans konta na danej ekonomii");
