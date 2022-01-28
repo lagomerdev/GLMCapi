@@ -8,7 +8,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import pl.glmc.core.bungee.GlmcCoreBungee;
 import pl.glmc.core.bungee.api.economy.ApiEconomyProvider;
 

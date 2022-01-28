@@ -70,6 +70,13 @@ public interface UserManager {
     String getUsername(UUID playerUniqueID, String defaultValue);
 
     /**
+     *
+     * @param username
+     * @return
+     */
+    UUID getUniqueId(String username);
+
+    /**
      * Unmodifiable set of registered usernames
      *
      * @return

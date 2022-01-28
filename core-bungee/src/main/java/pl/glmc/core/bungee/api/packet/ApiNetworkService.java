@@ -1,7 +1,6 @@
 package pl.glmc.core.bungee.api.packet;
 
-import net.md_5.bungee.api.ChatColor;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import pl.glmc.core.bungee.GlmcCoreBungee;
 import redis.clients.jedis.JedisPubSub;
 

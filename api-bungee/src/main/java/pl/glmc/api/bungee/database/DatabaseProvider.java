@@ -48,6 +48,7 @@ public class DatabaseProvider {
                 + this.databaseConfig.getDatabase() + "?autoReconnect=true");
         this.dataSource.setUsername(this.databaseConfig.getUsername());
         this.dataSource.setPassword(this.databaseConfig.getPassword());
+        this.dataSource.setPoolName(this.databaseConfig.getPoolName());
         this.dataSource.setMaximumPoolSize(this.databaseConfig.getMaxPoolSize());
         this.dataSource.setConnectionTimeout(60000);
         this.dataSource.addDataSourceProperty("dataSource.cachePrepStmts", "true");

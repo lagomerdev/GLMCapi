@@ -1,5 +1,7 @@
-package pl.glmc.api.common.packet;
+package pl.glmc.api.bukkit.packet;
 
+import org.bukkit.plugin.Plugin;
+import pl.glmc.api.common.packet.Packet;
 import pl.glmc.api.common.packet.listener.PacketListener;
 
 public interface PacketService {
@@ -23,33 +25,21 @@ public interface PacketService {
     /**
      *
      * @param packetListener
+     * @param plugin
      */
-    void registerListener(PacketListener<? extends Packet> packetListener);
+    void registerListener(PacketListener<? extends Packet> packetListener, Plugin plugin);
 
     /**
      *
      * @param packetListener
      * @param additionalId
+     * @param plugin
      */
-    void registerListener(PacketListener<? extends Packet> packetListener, String additionalId);
+    void registerListener(PacketListener<? extends Packet> packetListener, String additionalId, Plugin plugin);
 
     /**
      *
-     * @param packetInfo
+     * @param plugin
      */
-    void registerPacket(PacketInfo packetInfo);
-
-    /**
-     *
-     * @param packetId
-     * @return
-     */
-    Class<? extends Packet> getPacketClass(String packetId);
-
-    /**
-     *
-     * @param packetId
-     * @return
-     */
-    PacketInfo getPacketInfo(String packetId);
+    void unregister(Plugin plugin);
 }

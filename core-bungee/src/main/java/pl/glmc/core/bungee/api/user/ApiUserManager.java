@@ -2,6 +2,7 @@ package pl.glmc.core.bungee.api.user;
 
 import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.apache.commons.lang3.StringUtils;
 import pl.glmc.api.bungee.event.UserJoinEvent;
 import pl.glmc.api.bungee.user.CachedUserData;
 import pl.glmc.api.bungee.user.User;
@@ -203,7 +204,7 @@ public class ApiUserManager implements UserManager {
         CachedUserData userData = this.allRegisteredUsers.get(playerUniqueID);
 
         if (userData == null) {
-            throw new NullPointerException("Cannot find username for given unique id!");
+            return null;
         } else {
             return userData.getUsername();
         }
@@ -214,6 +215,17 @@ public class ApiUserManager implements UserManager {
         CachedUserData userData = this.allRegisteredUsers.get(playerUniqueID);
 
         return userData == null ? defaultValue : userData.getUsername();
+    }
+
+    @Override
+    public UUID getUniqueId(String username) {
+        for (Map.Entry<UUID, ApiCachedUserData> entry : this.allRegisteredUsers.entrySet()) {
+            if (StringUtils.equalsIgnoreCase(entry.getValue().getUsername(), username)) {
+                return entry.getKey();
+            }
+        }
+
+        return null;
     }
 
     @Override

@@ -6,6 +6,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import pl.glmc.api.common.economy.Economy;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public class LocalEconomyCacheListener implements Listener {

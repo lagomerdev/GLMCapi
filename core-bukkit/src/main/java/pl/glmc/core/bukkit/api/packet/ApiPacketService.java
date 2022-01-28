@@ -1,39 +1,33 @@
 package pl.glmc.core.bukkit.api.packet;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.gson.Gson;
 import com.google.gson.stream.MalformedJsonException;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.plugin.Plugin;
+import pl.glmc.api.bukkit.packet.PacketService;
 import pl.glmc.api.common.packet.Packet;
-import pl.glmc.api.common.packet.PacketInfo;
 import pl.glmc.api.common.packet.listener.PacketListener;
-import pl.glmc.api.common.packet.PacketService;
-import pl.glmc.api.common.packet.listener.ResponseHandlerListener;
 import pl.glmc.core.bukkit.GlmcCoreBukkit;
-import pl.glmc.core.common.packets.LocalPacketRegistry;
-import redis.clients.jedis.Response;
 
 import java.io.NotActiveException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
 
 public class ApiPacketService implements PacketService {
     private final GlmcCoreBukkit plugin;
 
-    private final HashMap<String, List<PacketListener<? extends Packet>>> registeredListeners;
-    private final HashMap<String, Class<? extends Packet>> registeredPacketClasses;
-    private final HashMap<String, PacketInfo> registeredPackets;
+    private final ListMultimap<String, PacketListener<? extends Packet>> registeredListenersChannels, registeredListenersPlugins;
 
     private final Method registrationMethod;
 
     public ApiPacketService(final GlmcCoreBukkit plugin) {
         this.plugin = plugin;
 
-        this.registeredListeners = new HashMap<>();
-        this.registeredPackets = new HashMap<>();
-        this.registeredPacketClasses = new HashMap<>();
+        this.registeredListenersChannels = ArrayListMultimap.create();
+        this.registeredListenersPlugins = ArrayListMultimap.create();
 
         try {
             this.registrationMethod = PacketListener.class.getDeclaredMethod("register", Gson.class);
@@ -41,8 +35,6 @@ public class ApiPacketService implements PacketService {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("Failed to load registration method!");
         }
-
-        this.registerDefaultPackets();
     }
 
     @Override
@@ -63,21 +55,37 @@ public class ApiPacketService implements PacketService {
 
         this.plugin.getLogger().info(ChatColor.YELLOW + "Sending packet " + packet.getPacketId() + " to " + target + " on channel " + packetChannel);
 
-        //System.out.println(ChatColor.RED + "" + "Sending " + System.currentTimeMillis());
         this.plugin.getRedisProvider().publish(packetChannel, jsonPacket);
     }
 
     @Override
-    public void registerListener(PacketListener<? extends Packet> packetListener) {
-        this.defaultRegisterListener(packetListener, null);
+    public void registerListener(PacketListener<? extends Packet> packetListener, Plugin plugin) {
+        this.defaultRegisterListener(packetListener, null, plugin);
     }
 
     @Override
-    public void registerListener(PacketListener<? extends Packet> packetListener, String additionalId) {
-        this.defaultRegisterListener(packetListener, additionalId);
+    public void registerListener(PacketListener<? extends Packet> packetListener, String additionalId, Plugin plugin) {
+        this.defaultRegisterListener(packetListener, additionalId, plugin);
     }
 
-    private void defaultRegisterListener(PacketListener<? extends Packet> packetListener, String additionalId) {
+    @Override
+    public void unregister(Plugin plugin) {
+        List<PacketListener<? extends Packet>> removedListeners = this.registeredListenersPlugins.removeAll(plugin.getDescription().getName());
+        this.registeredListenersChannels.entries().removeIf(entry -> {
+            PacketListener<? extends Packet> packetListener = entry.getValue();
+            String packetChannel = entry.getKey();
+
+            if (removedListeners.contains(packetListener)) {
+                this.plugin.getLogger().info(ChatColor.YELLOW + "Unregistered packet listener " + ChatColor.GOLD + packetChannel
+                        + ChatColor.YELLOW + " with class " + ChatColor.GOLD  + packetListener.getClass().getName()
+                        + ChatColor.YELLOW + " from plugin " + ChatColor.GOLD  + plugin.getDescription().getName());
+
+                return true;
+            } else return false;
+        });
+    }
+
+    private void defaultRegisterListener(PacketListener<? extends Packet> packetListener, String additionalId, Plugin plugin) {
         String channel = additionalId == null ? packetListener.getPacketInfo().getId() : packetListener.getPacketInfo().getId() + "." + additionalId;
 
         try {
@@ -91,50 +99,23 @@ public class ApiPacketService implements PacketService {
             return;
         }
 
-        this.registeredListeners.compute(channel, (key, value) -> {
-            if (value == null) {
-                return Lists.newArrayList(packetListener);
-            } else {
-                value.add(packetListener);
-
-                return value;
-            }
-        });
-
-        this.plugin.getLogger().info(ChatColor.GREEN + "Registered packet listener " + ChatColor.DARK_GREEN + packetListener.getPacketInfo().getId()
-                + ChatColor.GREEN + " with class " + ChatColor.DARK_GREEN  + packetListener.getClass().getName());
-    }
-
-    @Override
-    public void registerPacket(PacketInfo packetInfo) {
-        String packetId = packetInfo.getId();
-
-        if (this.registeredPackets.containsKey(packetId)) {
-            throw new IllegalArgumentException("This packet has been already registered!");
+        if (!this.registeredListenersChannels.containsValue(packetListener)) {
+            this.registeredListenersChannels.put(channel, packetListener);
+            this.registeredListenersPlugins.put(plugin.getName(), packetListener);
+        } else {
+            throw new RuntimeException("This packet listener has been already registered!");
         }
 
-        this.registeredPackets.put(packetId, packetInfo);
-        this.registeredPacketClasses.put(packetId, packetInfo.getPacketClass());
-
-        this.plugin.getLogger().info(ChatColor.GREEN + "Registered packet data " + ChatColor.DARK_GREEN + packetInfo.getId()
-            + ChatColor.GREEN + " with class " + ChatColor.DARK_GREEN + packetInfo.getPacketClass().getName());
-    }
-
-    @Override
-    public Class<? extends Packet> getPacketClass(String packetId) {
-        return this.registeredPacketClasses.get(packetId);
-    }
-
-    @Override
-    public PacketInfo getPacketInfo(String packetId) {
-        return this.registeredPackets.get(packetId);
+        this.plugin.getLogger().info(ChatColor.GREEN + "Registered packet listener " + ChatColor.DARK_GREEN + packetListener.getPacketInfo().getId()
+                + ChatColor.GREEN + " with class " + ChatColor.DARK_GREEN  + packetListener.getClass().getName()
+                + ChatColor.GREEN + " with plugin " + ChatColor.DARK_GREEN + plugin.getName());
     }
 
     protected void packetReceived(String packetChannel, String jsonPacket) {
         this.plugin.getLogger().info(ChatColor.YELLOW + "Received packet on channel: " + ChatColor.GOLD + packetChannel);
         this.plugin.getLogger().info(ChatColor.YELLOW + "Packet data: " + ChatColor.GOLD + jsonPacket);
 
-        List<PacketListener<? extends Packet>> packetListeners = this.registeredListeners.get(packetChannel);
+        List<PacketListener<? extends Packet>> packetListeners = this.registeredListenersChannels.get(packetChannel);
         if (packetListeners == null) {
             this.plugin.getLogger().info(ChatColor.RED + "Received packet but no listeners for that packet has been registered! Channel: " + packetChannel);
 
@@ -156,14 +137,5 @@ public class ApiPacketService implements PacketService {
                 this.plugin.getLogger().warning(ChatColor.RED + "Packet data: " + jsonPacket);
             }
         }
-    }
-
-    private void registerDefaultPackets() {
-        this.registerPacket(LocalPacketRegistry.SERVER.REGISTRATION_REQUEST);
-        this.registerPacket(LocalPacketRegistry.SERVER.REGISTRATION_RESPONSE);
-        this.registerPacket(LocalPacketRegistry.ECONOMY.REGISTRATION_REQUEST);
-        this.registerPacket(LocalPacketRegistry.ECONOMY.REGISTRATION_RESPONSE);
-        this.registerPacket(LocalPacketRegistry.ECONOMY.REGISTERED);
-        this.registerPacket(LocalPacketRegistry.ECONOMY.BALANCE_UPDATED);
     }
 }

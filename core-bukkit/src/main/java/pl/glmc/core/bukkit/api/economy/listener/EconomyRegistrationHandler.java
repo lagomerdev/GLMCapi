@@ -13,7 +13,7 @@ public class EconomyRegistrationHandler extends ResponseHandlerListener<EconomyR
 
         this.plugin = plugin;
 
-        this.plugin.getApiProvider().getPacketService().registerListener(this);
+        this.plugin.getApiProvider().getPacketService().registerListener(this, this.plugin);
     }
 
     @Override

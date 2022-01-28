@@ -48,6 +48,7 @@ public class DatabaseProvider {
                 + this.databaseConfig.getDatabase() + "?autoReconnect=true");
         this.dataSource.setUsername(this.databaseConfig.getUsername());
         this.dataSource.setPassword(this.databaseConfig.getPassword());
+        this.dataSource.setPoolName(this.databaseConfig.getPoolName());
         this.dataSource.setMaximumPoolSize(this.databaseConfig.getMaxPoolSize());
         this.dataSource.setConnectionTimeout(60000);
         this.dataSource.addDataSourceProperty("dataSource.cachePrepStmts", "true");
@@ -71,7 +72,7 @@ public class DatabaseProvider {
     }
 
     /**
-     * Closes pl.glmc.core.bukkit.pl.glmc.glmc.api.bungee.database connection pool
+     * Closes database connection pool
      */
     public void unload() {
         this.dataSource.close();
@@ -133,6 +134,7 @@ public class DatabaseProvider {
 
             CachedRowSet crs = rowSetFactory.createCachedRowSet();
             crs.populate(query.executeQuery());
+
             return crs;
         } catch (SQLException exception) {
             exception.printStackTrace();

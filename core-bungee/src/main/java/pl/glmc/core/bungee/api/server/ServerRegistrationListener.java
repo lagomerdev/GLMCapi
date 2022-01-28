@@ -17,7 +17,7 @@ public class ServerRegistrationListener extends PacketListener<ServerRegistratio
         this.plugin = plugin;
         this.serverManager = serverManager;
 
-        this.plugin.getApiProvider().getPacketService().registerListener(this);
+        this.plugin.getApiProvider().getPacketService().registerListener(this, this.plugin);
     }
 
     @Override

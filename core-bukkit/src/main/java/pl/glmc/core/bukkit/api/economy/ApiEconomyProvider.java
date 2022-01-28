@@ -56,14 +56,14 @@ public class ApiEconomyProvider implements Economy {
     public void load() {
         ApiEconomyListener apiEconomyListener = new ApiEconomyListener(this.plugin, this);
 
-        this.plugin.getApiProvider().getPacketService().registerListener(this.accountCreateHandler, this.economyConfig.getName());
-        this.plugin.getApiProvider().getPacketService().registerListener(this.accountExistsHandler, this.economyConfig.getName());
-        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceAddHandler, this.economyConfig.getName());
-        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceRemoveHandler, this.economyConfig.getName());
-        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceTransferHandler, this.economyConfig.getName());
-        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceSetHandler, this.economyConfig.getName());
-        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceInfoHandler, this.economyConfig.getName());
-        this.plugin.getApiProvider().getPacketService().registerListener(this.transactionLogHandler, this.economyConfig.getName());
+        this.plugin.getApiProvider().getPacketService().registerListener(this.accountCreateHandler, this.economyConfig.getName(), this.plugin);
+        this.plugin.getApiProvider().getPacketService().registerListener(this.accountExistsHandler, this.economyConfig.getName(), this.plugin);
+        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceAddHandler, this.economyConfig.getName(), this.plugin);
+        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceRemoveHandler, this.economyConfig.getName(), this.plugin);
+        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceTransferHandler, this.economyConfig.getName(), this.plugin);
+        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceSetHandler, this.economyConfig.getName(), this.plugin);
+        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceInfoHandler, this.economyConfig.getName(), this.plugin);
+        this.plugin.getApiProvider().getPacketService().registerListener(this.transactionLogHandler, this.economyConfig.getName(), this.plugin);
     }
 
     public void updateBalance(UUID accountUUID, BigDecimal balance) {

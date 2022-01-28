@@ -1,15 +1,15 @@
 package pl.glmc.core.bungee.api;
 
-import net.luckperms.api.cacheddata.CachedData;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.plugin.Plugin;
 import pl.glmc.api.bungee.GlmcApiBungee;
 import pl.glmc.api.bungee.GlmcApiBungeeProvider;
+import pl.glmc.api.bungee.packet.PacketService;
 import pl.glmc.api.bungee.server.ServerManager;
 import pl.glmc.api.bungee.user.UserManager;
 import pl.glmc.api.common.LuckPermsHook;
 import pl.glmc.api.common.economy.Economy;
 import pl.glmc.api.common.economy.EconomyFactory;
-import pl.glmc.api.common.packet.PacketService;
 import pl.glmc.core.bungee.GlmcCoreBungee;
 import pl.glmc.core.bungee.api.economy.ApiEconomyFactory;
 import pl.glmc.core.bungee.api.economy.local.LocalEconomy;
@@ -97,5 +97,10 @@ public class GlmcApiProvider implements GlmcApiBungee {
     @Override
     public UserManager getUserManager() {
         return this.userManager;
+    }
+
+    @Override
+    public void unload(Plugin plugin) {
+        this.packetService.unregister(plugin);
     }
 }

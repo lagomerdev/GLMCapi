@@ -15,7 +15,7 @@ public class ApiEconomyListener extends PacketListener<BalanceUpdated> {
         this.apiEconomyProvider = apiEconomyProvider;
         this.plugin = plugin;
 
-        this.plugin.getApiProvider().getPacketService().registerListener(this, apiEconomyProvider.getEconomyConfig().getName());
+        this.plugin.getApiProvider().getPacketService().registerListener(this, apiEconomyProvider.getEconomyConfig().getName(), this.plugin);
     }
 
     @Override

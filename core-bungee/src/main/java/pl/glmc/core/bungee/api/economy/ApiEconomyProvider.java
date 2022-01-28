@@ -135,14 +135,14 @@ public class ApiEconomyProvider implements Economy {
             this.plugin.getLogger().warning(ChatColor.RED + "Failed to load all accounts from economy " + this.economyConfig.getName());
         }
 
-        this.plugin.getApiProvider().getPacketService().registerListener(this.accountCreateListener, this.economyConfig.getName());
-        this.plugin.getApiProvider().getPacketService().registerListener(this.accountExistsListener, this.economyConfig.getName());
-        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceInfoListener, this.getEconomyConfig().getName());
-        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceAddListener, this.getEconomyConfig().getName());
-        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceRemoveListener, this.getEconomyConfig().getName());
-        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceTransferListener, this.getEconomyConfig().getName());
-        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceSetListener, this.getEconomyConfig().getName());
-        this.plugin.getApiProvider().getPacketService().registerListener(this.transactionLogListener, this.getEconomyConfig().getName());
+        this.plugin.getApiProvider().getPacketService().registerListener(this.accountCreateListener, this.economyConfig.getName(), this.plugin);
+        this.plugin.getApiProvider().getPacketService().registerListener(this.accountExistsListener, this.economyConfig.getName(), this.plugin);
+        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceInfoListener, this.getEconomyConfig().getName(), this.plugin);
+        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceAddListener, this.getEconomyConfig().getName(), this.plugin);
+        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceRemoveListener, this.getEconomyConfig().getName(), this.plugin);
+        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceTransferListener, this.getEconomyConfig().getName(), this.plugin);
+        this.plugin.getApiProvider().getPacketService().registerListener(this.balanceSetListener, this.getEconomyConfig().getName(), this.plugin);
+        this.plugin.getApiProvider().getPacketService().registerListener(this.transactionLogListener, this.getEconomyConfig().getName(), this.plugin);
     }
 
     public boolean insertLog(UUID accountUUID, BigDecimal amount, int action) {

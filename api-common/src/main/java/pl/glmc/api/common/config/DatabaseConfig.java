@@ -2,24 +2,25 @@ package pl.glmc.api.common.config;
 
 public class DatabaseConfig {
 
-    private final String host, database, username, password;
+    private final String host, database, username, password, poolName;
     private final int port, maxPoolSize;
 
     /**
      * Database connection credentials
-     *
-     * @param host host
+     *  @param host host
      * @param database database
      * @param username username
      * @param password password
+     * @param poolName
      * @param port port
      * @param maxPoolSize max pool size
      */
-    public DatabaseConfig(final String host, final String database, final String username, final String password, final int port, final int maxPoolSize) {
+    public DatabaseConfig(final String host, final String database, final String username, final String password, String poolName, final int port, final int maxPoolSize) {
         this.host = host;
         this.database = database;
         this.username = username;
         this.password = password;
+        this.poolName = poolName;
         this.port = port;
         this.maxPoolSize = maxPoolSize;
     }
@@ -50,6 +51,14 @@ public class DatabaseConfig {
      */
     public String getPassword() {
         return this.password;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getPoolName() {
+        return poolName;
     }
 
     /**

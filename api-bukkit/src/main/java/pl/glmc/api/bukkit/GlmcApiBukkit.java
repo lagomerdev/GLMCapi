@@ -1,10 +1,11 @@
 package pl.glmc.api.bukkit;
 
+import org.bukkit.plugin.Plugin;
+import pl.glmc.api.bukkit.packet.PacketService;
 import pl.glmc.api.bukkit.user.UserManager;
 import pl.glmc.api.common.LuckPermsHook;
 import pl.glmc.api.common.economy.Economy;
 import pl.glmc.api.common.economy.EconomyFactory;
-import pl.glmc.api.common.packet.PacketService;
 
 public interface GlmcApiBukkit {
 
@@ -48,4 +49,16 @@ public interface GlmcApiBukkit {
      * @return
      */
     UserManager getUserManager();
+
+    /**
+     *
+     * @param plugin
+     */
+    void unload(Plugin plugin);
+
+    /**
+     *
+     * @return server id
+     */
+    String getServerId();
 }

@@ -31,10 +31,11 @@ public class ConfigProvider {
         final String database = this.plugin.getConfig().getString("connections.mysql.database");
         final String username = this.plugin.getConfig().getString("connections.mysql.user");
         final String password = this.plugin.getConfig().getString("connections.mysql.password");
+        final String poolName = this.plugin.getConfig().getString("connections.mysql.pool_name");
         final int port = this.plugin.getConfig().getInt("connections.mysql.port");
         final int maxPoolSize = this.plugin.getConfig().getInt("connections.mysql.max_pool_size");
 
-        this.databaseConfig = new DatabaseConfig(host, database, username, password, port, maxPoolSize);
+        this.databaseConfig = new DatabaseConfig(host, database, username, password, poolName, port, maxPoolSize);
     }
 
     private void loadRedisConfig() {

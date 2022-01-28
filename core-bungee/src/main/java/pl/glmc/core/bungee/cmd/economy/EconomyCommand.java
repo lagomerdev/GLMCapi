@@ -6,7 +6,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import pl.glmc.api.common.config.EconomyConfig;
 import pl.glmc.api.common.economy.Economy;
 import pl.glmc.api.common.economy.Transaction;
@@ -135,9 +135,9 @@ public class EconomyCommand extends Command implements TabExecutor {
             if (matcher.matches()) {
                 accountUniqueId = UUID.fromString(uniqueId);
             } else {
-                ProxiedPlayer player = this.plugin.getProxy().getPlayer(args[2]);
+                accountUniqueId = this.plugin.getApiProvider().getUserManager().getUniqueId(uniqueId);
 
-                if (player == null) {
+                if (accountUniqueId == null) {
                     TextComponent errorResponse = new TextComponent();
                     errorResponse.addExtra(ChatColor.RED + "Podany parametr <account> nie odpowiada żadnemu istniejącemu kontu!");
                     errorResponse.addExtra(ChatColor.RED + "\n" + "Najprawdopodobniej podano błędne UUID lub nick Gracza, który jest offline...");
@@ -146,8 +146,6 @@ public class EconomyCommand extends Command implements TabExecutor {
 
                     return;
                 }
-
-                accountUniqueId = player.getUniqueId();
             }
 
             if (!economy.getRegisteredAccounts().containsKey(accountUniqueId)) {

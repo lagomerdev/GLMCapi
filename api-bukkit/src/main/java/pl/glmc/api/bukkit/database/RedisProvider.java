@@ -9,7 +9,6 @@ import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -182,6 +181,7 @@ public class RedisProvider {
         });
     }
 
+
     /**
      * Synchronously publishes redis string message
      *
@@ -333,7 +333,6 @@ public class RedisProvider {
      * @param callback callback
      * @param key map's key
      * @param field value's field
-     * @return value of given field
      */
     public void hgetAsync(final Callback<String> callback, final String key, final String field) {
         this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
@@ -350,9 +349,9 @@ public class RedisProvider {
      * @return map with fields and their values assigned to given key
      */
     public Map<String, String> hgetAll(final String key) {
-       try (Jedis jedis = this.jedisPool.getResource()) {
-           return jedis.hgetAll(key);
-       }
+        try (Jedis jedis = this.jedisPool.getResource()) {
+            return jedis.hgetAll(key);
+        }
     }
 
     /**
@@ -360,7 +359,6 @@ public class RedisProvider {
      *
      * @param callback callback
      * @param key map's key
-     * @return map with fields and their values assigned to given key
      */
     public void hgetAllAsync(final Callback<Map<String, String>> callback, final String key) {
         this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {

@@ -13,7 +13,7 @@ public class ServerRegistrationHandler extends ResponseHandlerListener<ServerReg
 
         this.plugin = plugin;
 
-        this.plugin.getApiProvider().getPacketService().registerListener(this);
+        this.plugin.getApiProvider().getPacketService().registerListener(this, this.plugin);
     }
 
     @Override

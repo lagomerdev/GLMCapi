@@ -2,7 +2,7 @@ package pl.glmc.api.bungee.database;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.plugin.Plugin;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import pl.glmc.api.common.Callback;
 import pl.glmc.api.common.config.RedisConfig;
 import redis.clients.jedis.*;

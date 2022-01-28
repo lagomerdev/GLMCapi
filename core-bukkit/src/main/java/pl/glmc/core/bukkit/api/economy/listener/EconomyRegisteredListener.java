@@ -14,7 +14,7 @@ public class EconomyRegisteredListener extends PacketListener<EconomyRegistered>
 
         this.plugin = plugin;
 
-        this.plugin.getApiProvider().getPacketService().registerListener(this);
+        this.plugin.getApiProvider().getPacketService().registerListener(this, this.plugin);
     }
 
     @Override
