@@ -132,6 +132,7 @@ public class ApiPacketService implements PacketService {
                         + " [" + packetListener.getClass().getName() + "]");
                 this.plugin.getLogger().warning(ChatColor.RED + "Packet data: " + jsonPacket);
             } catch (MalformedJsonException e) {
+                e.printStackTrace();
                 this.plugin.getLogger().warning(ChatColor.DARK_RED + "Received malformed packet!"
                         + " [" + packetListener.getClass().getName() + "]");
                 this.plugin.getLogger().warning(ChatColor.RED + "Packet data: " + jsonPacket);

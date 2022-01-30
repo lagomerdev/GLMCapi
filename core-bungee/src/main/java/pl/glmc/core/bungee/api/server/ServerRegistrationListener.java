@@ -26,7 +26,7 @@ public class ServerRegistrationListener extends PacketListener<ServerRegistratio
 
         ServerRegistrationResponse response;
         if (success) {
-            response = new ServerRegistrationResponse(true, packet.getUniqueId(), this.plugin.getApiProvider().getEconomyFactory().getRegisteredConfigs());
+            response = new ServerRegistrationResponse(true, packet.getUniqueId());
         } else {
             response = new ServerRegistrationResponse(false, packet.getUniqueId());
         }

@@ -1,19 +1,13 @@
 package pl.glmc.core.bukkit.api;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import pl.glmc.api.bukkit.GlmcApiBukkit;
 import pl.glmc.api.bukkit.GlmcApiBukkitProvider;
 import pl.glmc.api.bukkit.packet.PacketService;
 import pl.glmc.api.bukkit.user.UserManager;
 import pl.glmc.api.common.LuckPermsHook;
-import pl.glmc.api.common.economy.Economy;
-import pl.glmc.api.common.economy.EconomyFactory;
 import pl.glmc.core.bukkit.GlmcCoreBukkit;
-import pl.glmc.core.bukkit.api.economy.ApiEconomyFactory;
-import pl.glmc.core.bukkit.api.economy.local.LocalEconomy;
 import pl.glmc.core.bukkit.api.hook.ApiLuckPermsHook;
 import pl.glmc.core.bukkit.api.packet.ApiNetworkService;
 import pl.glmc.core.bukkit.api.packet.ApiPacketService;
@@ -26,9 +20,6 @@ public class GlmcApiProvider implements GlmcApiBukkit {
 
     private ApiPacketService packetService;
     private ApiNetworkService networkService;
-
-    private ApiEconomyFactory economyFactory;
-    private LocalEconomy localEconomy;
 
     private LuckPermsHook luckPermsHook;
 
@@ -45,9 +36,6 @@ public class GlmcApiProvider implements GlmcApiBukkit {
 
         this.luckPermsHook = new ApiLuckPermsHook(this.plugin);
 
-        this.economyFactory = new ApiEconomyFactory(this.plugin);
-        this.localEconomy = new LocalEconomy(this.plugin);
-
         this.serverManager = new ServerManager(this.plugin);
 
         GlmcApiBukkitProvider.register(this);
@@ -58,21 +46,6 @@ public class GlmcApiProvider implements GlmcApiBukkit {
     @Override
     public LuckPermsHook getLuckPermsHook() {
         return this.luckPermsHook;
-    }
-
-    @Override
-    public EconomyFactory getEconomyFactory() {
-        return this.economyFactory;
-    }
-
-    @Override
-    public Economy getPlayerBankEconomy() {
-        return this.localEconomy.getPlayerBankEconomy();
-    }
-
-    @Override
-    public Economy getPlayerCashEconomy() {
-        return this.localEconomy.getPlayerCashEconomy();
     }
 
     @Override
