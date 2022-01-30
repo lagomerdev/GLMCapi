@@ -8,6 +8,7 @@ import pl.glmc.api.bukkit.packet.PacketService;
 import pl.glmc.api.bukkit.user.UserManager;
 import pl.glmc.api.common.LuckPermsHook;
 import pl.glmc.core.bukkit.GlmcCoreBukkit;
+import pl.glmc.core.bukkit.api.bridge.BukkitBridgeProvider;
 import pl.glmc.core.bukkit.api.hook.ApiLuckPermsHook;
 import pl.glmc.core.bukkit.api.packet.ApiNetworkService;
 import pl.glmc.core.bukkit.api.packet.ApiPacketService;
@@ -37,6 +38,8 @@ public class GlmcApiProvider implements GlmcApiBukkit {
         this.luckPermsHook = new ApiLuckPermsHook(this.plugin);
 
         this.serverManager = new ServerManager(this.plugin);
+
+        BukkitBridgeProvider bukkitBridgeProvider = new BukkitBridgeProvider(this.plugin);
 
         GlmcApiBukkitProvider.register(this);
 

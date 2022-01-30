@@ -1,6 +1,7 @@
 package pl.glmc.core.bungee;
 
 import com.google.gson.Gson;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import pl.glmc.api.bungee.database.DatabaseProvider;
 import pl.glmc.api.bungee.database.RedisProvider;

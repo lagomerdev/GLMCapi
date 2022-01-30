@@ -4,11 +4,13 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.plugin.Plugin;
 import pl.glmc.api.bungee.GlmcApiBungee;
 import pl.glmc.api.bungee.GlmcApiBungeeProvider;
+import pl.glmc.api.bungee.bridge.BukkitBridge;
 import pl.glmc.api.bungee.packet.PacketService;
 import pl.glmc.api.bungee.server.ServerManager;
 import pl.glmc.api.bungee.user.UserManager;
 import pl.glmc.api.common.LuckPermsHook;
 import pl.glmc.core.bungee.GlmcCoreBungee;
+import pl.glmc.core.bungee.api.bridge.ApiBukkitBridge;
 import pl.glmc.core.bungee.api.hook.ApiLuckPermsHook;
 import pl.glmc.core.bungee.api.packet.ApiNetworkService;
 import pl.glmc.core.bungee.api.packet.ApiPacketService;
@@ -31,6 +33,8 @@ public class GlmcApiProvider implements GlmcApiBungee {
 
     private ApiUserManager userManager;
 
+    private ApiBukkitBridge bukkitBridge;
+
     public GlmcApiProvider(GlmcCoreBungee plugin) {
         this.plugin = plugin;
     }
@@ -44,6 +48,8 @@ public class GlmcApiProvider implements GlmcApiBungee {
         this.serverManager = new ApiServerManager(this.plugin);
 
         this.userManager = new ApiUserManager(this.plugin);
+
+        this.bukkitBridge = new ApiBukkitBridge(this.plugin);
 
         GlmcApiBungeeProvider.register(this);
 
@@ -68,6 +74,11 @@ public class GlmcApiProvider implements GlmcApiBungee {
     @Override
     public UserManager getUserManager() {
         return this.userManager;
+    }
+
+    @Override
+    public BukkitBridge getBukkitBridge() {
+        return this.bukkitBridge;
     }
 
     @Override
