@@ -1,10 +1,10 @@
 package pl.glmc.core.bungee;
 
 import com.google.gson.Gson;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import pl.glmc.api.bungee.database.DatabaseProvider;
 import pl.glmc.api.bungee.database.RedisProvider;
+import pl.glmc.api.bungee.message.MessagesProvider;
 import pl.glmc.core.bungee.api.GlmcApiProvider;
 import pl.glmc.core.bungee.config.ConfigProvider;
 
@@ -30,6 +30,9 @@ public class GlmcCoreBungee extends Plugin {
     public void onEnable() {
         this.apiProvider = new GlmcApiProvider(this);
         this.apiProvider.load();
+
+        MessagesProvider messagesProvider = new MessagesProvider(this, true);
+        System.out.println(messagesProvider.getMessage("test"));
     }
 
     @Override
